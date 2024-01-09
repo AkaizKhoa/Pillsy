@@ -1,12 +1,12 @@
 import { SafeAreaView, StyleSheet, Text, View, StatusBar } from 'react-native';
 import SignupLogin1 from './components/SignupLogin1';
 import SignupLogin2 from './components/SignupLogin2';
-
+import MainScreen from './components/MainScreen';
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content"/>
-      <SignupLogin2/>      
+      <MainScreen/>
     </SafeAreaView>
   );
 }
