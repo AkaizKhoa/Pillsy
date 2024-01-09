@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, Text, View, StatusBar } from 'react-native';
-import SignupLogin1 from './components/SigupLogin1';
+import SignupLogin1 from './components/SignupLogin1';
 import SignupLogin2 from './components/SignupLogin2';
 
 export default function App() {
