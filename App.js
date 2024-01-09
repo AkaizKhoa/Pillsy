@@ -5,12 +5,13 @@ import SignupLogin3 from './components/SignupLogin3';
 import MainScreen from './components/MainScreen';
 import CustomerSupport1 from './components/CustomerSupport1';
 import CustomerSupport2 from './components/CustomerSupport2';
+import CustomerFeedBack1 from './components/CustomerFeedBack1';
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content"/>
-      <CustomerSupport2/>
+      <CustomerFeedBack1/>
     </SafeAreaView>
   );
 }
