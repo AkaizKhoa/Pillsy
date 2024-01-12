@@ -1,14 +1,14 @@
 import { View, Text, Image, StyleSheet, Button, Icon, TouchableOpacity, ScrollView, } from "react-native";
 import Vector2 from '../assets/Vector2.svg'
 import IconThreeDot from 'react-native-vector-icons/Entypo'
-import IconCamera from '../assets/icon-camera.svg'
-import IconCustomerFeedback from '../assets/icon-customer-feedback.svg'
-import IconCustomerSupport from '../assets/icon-customer-support.svg'
-import IconDoctorConnection from '../assets/icon-doctor-connection.svg'
-import IconManagePrescription from '../assets/icon-manage-prescription.svg'
-import IconPayment from '../assets/icon-payment.svg'
-import IconPillJourney from '../assets/icon-pills-journey.svg'
-import IconSchedule from '../assets/icon-schedule.svg'
+import IconCamera from '../assets/icon/icon-camera.svg'
+import IconCustomerFeedback from '../assets/icon/icon-customer-feedback.svg'
+import IconCustomerSupport from '../assets/icon/icon-customer-support.svg'
+import IconDoctorConnection from '../assets/icon/icon-doctor-connection.svg'
+import IconManagePrescription from '../assets/icon/icon-manage-prescription.svg'
+import IconPayment from '../assets/icon/icon-payment.svg'
+import IconPillJourney from '../assets/icon/icon-pills-journey.svg'
+import IconSchedule from '../assets/icon/icon-schedule.svg'
 
 import DropShadow from "react-native-drop-shadow";
 import { useFonts } from "expo-font";
@@ -23,13 +23,13 @@ export default function MainScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.containerVector}>
-                <Vector2 style={styles.imageVector} width={"100%"}  ></Vector2>
+                <Vector2 style={styles.imageVector} width={"200%"}></Vector2>
             </View>
 
             <ScrollView style={styles.containerContext}>
                 <View style={styles.containerText}>
                     <Text style={[styles.pillsy, { fontFamily: "Inter-Bold" }]}>Pillsy</Text>
-                    <View style={[styles.boxWelcome, styles.androidShadow]}>
+                    <View style={[styles.boxWelcome, styles.shadowBoxWelcome]}>
                         <Text style={styles.textWelcome}>Welcome to Pillsy!</Text>
                     </View>
                 </View>
@@ -73,7 +73,7 @@ export default function MainScreen() {
                             }}></IconThreeDot>
                         </View>
                         <Text style={styles.featureContent}>
-                        Manage Prescription
+                            Manage Prescription
                         </Text>
                     </View>
 
@@ -94,7 +94,7 @@ export default function MainScreen() {
                             }}></IconThreeDot>
                         </View>
                         <Text style={styles.featureContent}>
-                           Reminders-Scheduling
+                            Reminders-Scheduling
                         </Text>
                     </View>
 
@@ -202,7 +202,7 @@ export default function MainScreen() {
                         </Text>
                     </View>
 
-                   
+
 
                 </View>
             </ScrollView>
@@ -222,12 +222,15 @@ const styles = StyleSheet.create(
         containerVector: {
             position: "absolute",
             width: "100%",
+            top: -200,
+            right: 150
+            // height:280,
+            // backgroundColor:"#017AFE"
         },
         imageVector: {
-            bottom: 10
         },
         containerContext: {
-            
+
         },
         containerText: {
             padding: 40,
@@ -262,8 +265,20 @@ const styles = StyleSheet.create(
             fontWeight: "800",
             paddingLeft: 15
         },
-        androidShadow: {
-            elevation: 10,
+        shadowBoxWelcome: {
+            ...Platform.select({
+                ios: {
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                },
+                android: {
+                    elevation: 20,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                },
+            }),
         },
         containerFeatures: {
             flexDirection: "row",
@@ -281,11 +296,21 @@ const styles = StyleSheet.create(
             flexDirection: "column",
             justifyContent: "space-between",
             padding: 15,
-            shadowOffset: { width: -10, height: 10 },
-            shadowColor: "#000",
-            shadowRadius: 10,
-            elevation: 10
+            // shadowOffset: { width: -10, height: 10 },
+            // shadowColor: "#000",
+            // shadowRadius: 10,
+            // elevation: 10
+            ...Platform.select({
+                ios: {
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                },
+                android: {
+                    elevation: 10
 
+                },
+            }),
         },
         groupButton: {
             flexDirection: "row",
@@ -305,7 +330,7 @@ const styles = StyleSheet.create(
         iconThreeDot: {
             fontSize: 15
         },
-        featureContent:{
+        featureContent: {
             fontSize: 13,
             fontWeight: "700",
         }

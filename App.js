@@ -13,7 +13,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content"/>
-      <Scan></Scan>
+      <MainScreen/>
     </SafeAreaView>
   );
 }
