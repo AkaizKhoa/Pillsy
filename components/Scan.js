@@ -153,10 +153,14 @@ const styles = StyleSheet.create({
 
   },
   containerFrame: {
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 20,
   },
   containerCamera: {
-    width: 300,
-    height: 400,
+    width: 289,
+    height: 432,
     alignItems: 'center',
     justifyContent: 'center',
   },
