@@ -29,6 +29,9 @@ export default function MainScreen() {
             <ScrollView style={styles.containerContext}>
                 <View style={styles.containerText}>
                     <Text style={[styles.pillsy, { fontFamily: "Inter-Bold" }]}>Pillsy</Text>
+                    <View style={styles.helloUserContainer}>
+                        <Text style={styles.helloUserText}>Hello, <Text style={{color: '#FF6AB2'}}>User's Name</Text> 🙋🏻‍♂️</Text>
+                    </View>
                     <View style={[styles.boxWelcome, styles.shadowBoxWelcome]}>
                         <Text style={styles.textWelcome}>Welcome to Pillsy!</Text>
                     </View>
@@ -235,7 +238,15 @@ const styles = StyleSheet.create(
         containerText: {
             padding: 40,
             flexDirection: "column",
-            gap: 40
+            gap: 20
+        },
+        helloUserContainer:{
+            alignItems: "flex-end",
+        },
+        helloUserText:{
+            fontFamily: 'Inter-Bold',
+            color: "white",
+            fontSize: 20,
         },
         pillsy: {
             textTransform: "uppercase",

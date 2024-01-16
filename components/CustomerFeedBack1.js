@@ -8,6 +8,7 @@ import {
   TextInput,
   Keyboard,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useFonts } from "expo-font";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
@@ -49,7 +50,8 @@ export default function CustomerFeedBack1() {
           <ArrowBackLeft />
         </Pressable>
       </View>
-      <ScrollView>
+      <ScrollView style={styles.screen}>
+        <KeyboardAvoidingView style={styles.screen} behavior="position">
         <View style={styles.feedbackContainer}>
           <View style={styles.feedbackTextContainer}>
             <Text
@@ -111,14 +113,19 @@ export default function CustomerFeedBack1() {
             </Pressable>
           </View>
         </View>
+        </KeyboardAvoidingView>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
     flexDirection: "column",
+    flex: 1,
   },
   arrowBackContainer: {
     marginLeft: 20,

@@ -7,6 +7,7 @@ import {
   Pressable,
   TextInput,
   Keyboard,
+  KeyboardAvoidingView
 } from "react-native";
 import { useFonts } from "expo-font";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
@@ -40,7 +41,8 @@ export default function CustomerSupport1() {
           <ArrowBackLeft />
         </Pressable>
       </View>
-      <ScrollView>
+      <ScrollView style={styles.screen}>
+      <KeyboardAvoidingView style={styles.screen} behavior="position">
         <View style={styles.contactContainer}>
           <Text style={[styles.contactText, { fontFamily: "Inter-Bold" }]}>
             Contact us
@@ -93,13 +95,19 @@ export default function CustomerSupport1() {
             </Pressable>
           </View>
         </View>
+      </KeyboardAvoidingView>
+
       </ScrollView>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   container: {
     flexDirection: "column",
+    flex: 1,
   },
   arrowBackContainer: {
     marginLeft: 20,
