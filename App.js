@@ -58,7 +58,7 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <StatusBar barStyle="dark-content" />
       <ManagePrescriptions></ManagePrescriptions>
     </SafeAreaView>
