@@ -8,12 +8,13 @@ import CustomerSupport2 from './components/CustomerSupport2';
 import CustomerFeedBack1 from './components/CustomerFeedBack1';
 import Scan from './components/Scan';
 import CustomerFeedBack2 from './components/CustomerFeedBack2';
+import ManagePrescriptions from './components/ManagePrescriptions';
 
 export default function App() {
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content"/>
-      <MainScreen/>
+      <StatusBar barStyle="dark-content" />
+      <ManagePrescriptions></ManagePrescriptions>
     </SafeAreaView>
   );
 }
