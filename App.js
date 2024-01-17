@@ -13,6 +13,11 @@ import CustomerFeedBack1 from "./components/CustomerFeedBack1";
 import Scan from "./components/Scan";
 import CustomerFeedBack2 from "./components/CustomerFeedBack2";
 import ManagePrescriptions from "./components/ManagePrescriptions";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import HomeNavigator from "./routers/navigators/HomeNavigator";
+
+
+const Stack = createNativeStackNavigator()
 
 
 export default function App() {
@@ -60,7 +65,7 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <StatusBar barStyle="dark-content" />
-      <ManagePrescriptions></ManagePrescriptions>
+      <HomeNavigator></HomeNavigator>
     </SafeAreaView>
   );
 }
@@ -69,5 +74,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+
   },
 });
