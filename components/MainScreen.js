@@ -12,7 +12,15 @@ import IconSchedule from '../assets/icon/icon-schedule.svg'
 
 import DropShadow from "react-native-drop-shadow";
 import { useFonts } from "expo-font";
+
+
+import { useNavigation } from '@react-navigation/native';
+
+
 export default function MainScreen() {
+
+    const navigation = useNavigation();
+
     const [fontsLoaded] = useFonts({
         "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
         "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
@@ -43,7 +51,9 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    // Handle login button press
+                                    
+                                    navigation.navigate("Scan")
+
                                 }}
                             >
                                 <View style={styles.iconFeature}>
@@ -64,7 +74,9 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    // Handle login button press
+                                   
+                                    navigation.navigate("ManagePrescriptions")
+
                                 }}
                             >
                                 <View style={styles.iconFeature}>

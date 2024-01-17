@@ -3,14 +3,24 @@ import { useState } from "react";
 import DotCard from "../assets/icon/dot-card.svg"
 import IconSearch from "../assets/icon/search-icon.svg"
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
+
+import { useNavigation } from '@react-navigation/native';
+
 export default function ManagePrescriptions() {
 
     const [prescription, setPrescription] = useState("");
 
+    const navigation = useNavigation();
+
+
     return (
         <View style={styles.container}>
             <View style={styles.arrowBackContainer}>
-                <Pressable style={({ pressed }) => pressed && styles.pressedItem}>
+                <Pressable style={({ pressed }) => pressed && styles.pressedItem} 
+                onPress={() => {
+                    navigation.navigate("MainScreen")
+
+                }}>
                     <ArrowBackLeft />
                 </Pressable>
             </View>
@@ -28,40 +38,40 @@ export default function ManagePrescriptions() {
 
 
             <ScrollView style={styles.listPrescription}>
-                    <View style={styles.cardPrescription}>
-                        <DotCard ></DotCard>
-                        <View style={styles.groupText}>
-                            <Text style={styles.title}>
-                                Cardiovascular prescription
-                            </Text>
-                            <Text style={styles.context}>
-                                • Acebutolol (Sectral)
-                            </Text>
-                            <Text style={styles.context}>
-                                • Atenolol (Tenormin)
-                            </Text >
-                            <Text style={styles.context}>
-                                • Betaxolol (Kerlone)
-                            </Text>
-                        </View>
+                <View style={styles.cardPrescription}>
+                    <DotCard ></DotCard>
+                    <View style={styles.groupText}>
+                        <Text style={styles.title}>
+                            Cardiovascular prescription
+                        </Text>
+                        <Text style={styles.context}>
+                            • Acebutolol (Sectral)
+                        </Text>
+                        <Text style={styles.context}>
+                            • Atenolol (Tenormin)
+                        </Text >
+                        <Text style={styles.context}>
+                            • Betaxolol (Kerlone)
+                        </Text>
                     </View>
-                    <View style={styles.cardPrescription}>
-                        <DotCard></DotCard>
-                        <View style={styles.groupText}>
-                            <Text style={styles.title}>
-                                Stomach prescription
-                            </Text>
-                            <Text style={styles.context}>
-                                • Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole
-                            </Text>
-                            <Text style={styles.context}>
-                                • Pantoprazole sodium Pantoprazole sodium Pantoprazole sodium Pantoprazole sodium Pantoprazole sodiumPantoprazole sodium
-                            </Text>
-                            <Text style={styles.context}>
-                                • Famotidine
-                            </Text>
-                        </View>
+                </View>
+                <View style={styles.cardPrescription}>
+                    <DotCard></DotCard>
+                    <View style={styles.groupText}>
+                        <Text style={styles.title}>
+                            Stomach prescription
+                        </Text>
+                        <Text style={styles.context}>
+                            • Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole
+                        </Text>
+                        <Text style={styles.context}>
+                            • Pantoprazole sodium Pantoprazole sodium Pantoprazole sodium Pantoprazole sodium Pantoprazole sodiumPantoprazole sodium
+                        </Text>
+                        <Text style={styles.context}>
+                            • Famotidine
+                        </Text>
                     </View>
+                </View>
 
 
 
@@ -75,7 +85,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     arrowBackContainer: {
-        paddingHorizontal: 20,
+        width: 80,
+        marginLeft: 20,
         marginTop: 50
 
     },
@@ -131,11 +142,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginVertical: 10,
 
-     
+
     },
 
     shadowedContent: {
-      
+
     },
     title: {
         fontSize: 20,
