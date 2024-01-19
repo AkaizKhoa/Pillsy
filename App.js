@@ -78,7 +78,8 @@ export default function App() {
         style={[styles.container, { marginTop: marginTopDistance }]}
         onLayout={onLayoutRootView}
       >
-        <HomeNavigator></HomeNavigator>
+        {/* <HomeNavigator></HomeNavigator> */}
+        <ReminderScheduling></ReminderScheduling>
       </View>
     </>
   );
