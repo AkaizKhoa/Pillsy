@@ -148,8 +148,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "auto",
     flexDirection: "column",
-    justifyContent: "space-evenly"
-
+    gap: 12
   },
   containerText: {
     width: "100%",
@@ -248,6 +247,7 @@ const styles = StyleSheet.create({
   },
   arrowBackContainer:{
     width: 80,
-    marginLeft: 22
+        marginLeft: 20,
+        marginTop: 50
   }
 });

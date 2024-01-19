@@ -15,8 +15,13 @@ import GoogleIcon from "../assets/icon/google_icon.svg";
 import FaceBookIcon from "../assets/icon/facebook_icon.svg";
 import AppleIcon from "../assets/icon/apple_icon.svg";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
+import { useNavigation } from '@react-navigation/native';
 
 export default function SignupLogin3() {
+
+  const navigation = useNavigation();
+
+
   const [fontsLoaded] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
@@ -27,7 +32,11 @@ export default function SignupLogin3() {
   return (
     <View style={styles.container}>
       <View style={styles.arrowBackContainer}>
-        <Pressable style={({ pressed }) => pressed && styles.pressedItem}>
+        <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+          onPress={() => {
+            navigation.navigate("SignUpLogin1")
+
+        }}>
           <ArrowBackLeft />
         </Pressable>
       </View>

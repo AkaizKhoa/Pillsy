@@ -3,9 +3,10 @@ import React, { useRef, useState } from "react";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 import RedDot from "../assets/icon/red-dot.svg"
 
+import { useNavigation } from '@react-navigation/native';
 
 export default function ReminderScheduling() {
-
+    const navigation = useNavigation();
     const dataDate=[
         {
             id: 1,
@@ -291,7 +292,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#f1f4f8"
     },
     arrowBackContainer:{
-        paddingHorizontal: 20
+        width: 80,
+        marginLeft: 20,
+        marginTop: 50
     },
     containerTitle: {
         paddingHorizontal: 35,

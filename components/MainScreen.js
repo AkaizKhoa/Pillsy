@@ -34,7 +34,7 @@ export default function MainScreen() {
                 <Vector2 style={styles.imageVector} width={"200%"}></Vector2>
             </View>
 
-            <ScrollView style={styles.containerContext}>
+            <ScrollView style={styles.containerContext} showsVerticalScrollIndicator={false}>
                 <View style={styles.containerText}>
                     <Text style={[styles.pillsy, { fontFamily: "Inter-Bold" }]}>Pillsy</Text>
                     <View style={styles.helloUserContainer}>
@@ -97,7 +97,10 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    // Handle login button press
+                                    
+                                    navigation.navigate("ReminderScheduling")
+                                    
+
                                 }}
                             >
                                 <View style={styles.iconFeature}>
