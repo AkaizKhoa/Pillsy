@@ -27,10 +27,8 @@ export default function SignupLogin3() {
   return (
     <View style={styles.container}>
       <View style={styles.arrowBackContainer}>
-        <Pressable
-        style={({pressed}) => pressed && styles.pressedItem}
-        >
-        <ArrowBackLeft />
+        <Pressable style={({ pressed }) => pressed && styles.pressedItem}>
+          <ArrowBackLeft />
         </Pressable>
       </View>
       <View style={styles.containerHi}>
@@ -40,24 +38,39 @@ export default function SignupLogin3() {
         </Text>
       </View>
       <View style={styles.containerInput}>
-        <TextInput
-          style={[styles.input, { fontFamily: "Inter-Bold", marginBottom: 50 }]}
-          placeholder="abc"
-          keyboardType="default"
-          placeholderTextColor={"#224E9A"}
-        />
-        <TextInput
-          style={[styles.input, { fontFamily: "Inter-Bold", marginBottom: 50 }]}
-          placeholder="abc@gmail.com"
-          keyboardType="email-address"
-          placeholderTextColor={"#224E9A"}
-        />
-        <TextInput
-          style={[styles.input, { fontFamily: "Inter-Bold" }]}
-          placeholder="Password"
-          secureTextEntry={true}
-          placeholderTextColor={"#224E9A"}
-        />
+        <View>
+          <Text style={styles.labelInput}>Email</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { fontFamily: "Inter-Bold", marginBottom: 20 },
+            ]}
+            placeholder="abc@gmail.com"
+            keyboardType="email-address"
+            placeholderTextColor={"#224E9A"}
+          />
+        </View>
+        <View>
+          <Text style={styles.labelInput}>Password</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { fontFamily: "Inter-Bold", marginBottom: 20 },
+            ]}
+            placeholder="●●●●●●●"
+            secureTextEntry={true}
+            placeholderTextColor={"#224E9A"}
+          />
+        </View>
+        <View>
+          <Text style={styles.labelInput}>Confirm Password</Text>
+          <TextInput
+            style={[styles.input, { fontFamily: "Inter-Bold" }]}
+            placeholder="●●●●●●●"
+            secureTextEntry={true}
+            placeholderTextColor={"#224E9A"}
+          />
+        </View>
       </View>
       <View style={styles.containerButton}>
         <TouchableOpacity
@@ -100,9 +113,10 @@ export default function SignupLogin3() {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 60,
     flexDirection: "column",
   },
-  arrowBackContainer:{
+  arrowBackContainer: {
     marginLeft: 20,
   },
   pressedItem: {
@@ -127,9 +141,12 @@ const styles = StyleSheet.create({
   },
   containerInput: {
     flexDirection: "column",
-    marginTop: 60,
+    marginTop: 30,
     marginHorizontal: 60,
     marginBottom: 60,
+  },
+  labelInput: {
+    color: "#575757",
   },
   input: {
     borderWidth: 1,

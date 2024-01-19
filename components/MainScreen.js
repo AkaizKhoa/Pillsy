@@ -181,7 +181,8 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    // Handle login button press
+                                    // Handle Customer FeedBack button press - navigate
+                                    navigation.navigate("CustomerFeedBack1")
                                 }}
                             >
                                 <View style={styles.iconFeature}>
@@ -201,7 +202,8 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    // Handle login button press
+                                    // Handle Customer Support button press - navigate
+                                    navigation.navigate("CustomerSupport1")
                                 }}
                             >
                                 <View style={styles.iconFeature}>

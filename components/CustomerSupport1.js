@@ -14,8 +14,11 @@ import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 import UserIcon from "../assets/icon/user_icon.svg";
 import EmailIcon from "../assets/icon/email_icon.svg";
 import MessageIcon from "../assets/icon/message_icon.svg";
+import { useNavigation } from "@react-navigation/native";
 
 export default function CustomerSupport1() {
+  //Navigation
+  const navigation = useNavigation();
   // MESSAGE HANDLE
   const [message, setMessage] = useState("");
   const charLimit = 250;
@@ -37,7 +40,12 @@ export default function CustomerSupport1() {
   return (
     <View style={styles.container}>
       <View style={styles.arrowBackContainer}>
-        <Pressable style={({ pressed }) => pressed && styles.pressedItem}>
+        <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+        onPress={() => {
+          navigation.navigate("MainScreen")
+
+      }}
+        >
           <ArrowBackLeft />
         </Pressable>
       </View>
@@ -106,6 +114,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
+    marginTop: 60,
     flexDirection: "column",
     flex: 1,
   },
