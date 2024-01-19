@@ -15,6 +15,7 @@ import CustomerFeedBack2 from "./components/CustomerFeedBack2";
 import ManagePrescriptions from "./components/ManagePrescriptions";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeNavigator from "./routers/navigators/HomeNavigator";
+import ReminderScheduling from "./components/ReminderScheduling";
 
 
 const Stack = createNativeStackNavigator()
@@ -65,7 +66,8 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <StatusBar barStyle="dark-content" />
-      <HomeNavigator></HomeNavigator>
+      {/* <HomeNavigator></HomeNavigator> */}
+      <ReminderScheduling></ReminderScheduling>
     </SafeAreaView>
   );
 }
