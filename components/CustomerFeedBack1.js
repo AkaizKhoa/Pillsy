@@ -15,8 +15,11 @@ import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 import MessageIcon from "../assets/icon/message_icon.svg";
 import StarFilled from "../assets/icon/star_filled.svg";
 import StarNotFilled from "../assets/icon/star_not_fill.svg";
+import { useNavigation } from "@react-navigation/native";
 
 export default function CustomerFeedBack1() {
+  //Navigation
+  const navigation = useNavigation();
   //STAR HANDLE
   const [rating, setRating] = useState(4);
 
@@ -46,7 +49,12 @@ export default function CustomerFeedBack1() {
   return (
     <View style={styles.container}>
       <View style={styles.arrowBackContainer}>
-        <Pressable style={({ pressed }) => pressed && styles.pressedItem}>
+        <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+        onPress={() => {
+          navigation.navigate("MainScreen")
+
+      }}
+        >
           <ArrowBackLeft />
         </Pressable>
       </View>
@@ -124,6 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
+    marginTop: 60,
     flexDirection: "column",
     flex: 1,
   },
