@@ -26,7 +26,7 @@ const HomeNavigator = () => {
           headerTransparent: true,
           headerShown: false,
           contentStyle: { backgroundColor: "#FFF" },
-          animation: "fade_from_bottom",
+          animation: "ios",
         }}
       >
         {auth ? (
