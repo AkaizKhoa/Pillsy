@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, Button, Icon, TouchableOpacity, ScrollView, } from "react-native";
+import { View, Text, Image, StyleSheet, Button, Icon, TouchableOpacity, ScrollView, Pressable, } from "react-native";
 import Vector2 from '../assets/Vector2.svg'
 import IconThreeDot from 'react-native-vector-icons/Entypo'
 import IconCamera from '../assets/icon/icon-camera.svg'
@@ -15,6 +15,8 @@ import { useFonts } from "expo-font";
 
 
 import { useNavigation } from '@react-navigation/native';
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 
 export default function MainScreen() {
@@ -28,6 +30,10 @@ export default function MainScreen() {
     if (!fontsLoaded) {
         return undefined;
     }
+
+    const { logout } = useContext(AuthContext);
+
+
     return (
         <View style={styles.container}>
             <View style={styles.containerVector}>
@@ -38,12 +44,17 @@ export default function MainScreen() {
                 <View style={styles.containerText}>
                     <Text style={[styles.pillsy, { fontFamily: "Inter-Bold" }]}>Pillsy</Text>
                     <View style={styles.helloUserContainer}>
-                        <Text style={styles.helloUserText}>Hello, <Text style={{color: '#FF6AB2'}}>User's Name</Text> 🙋🏻‍♂️</Text>
+                        <Text style={styles.helloUserText}>Hello, <Text style={{ color: '#FF6AB2' }}>User's Name</Text> 🙋🏻‍♂️</Text>
                     </View>
                     <View style={[styles.boxWelcome, styles.shadowBoxWelcome]}>
                         <Text style={styles.textWelcome}>Welcome to Pillsy!</Text>
                     </View>
                 </View>
+                <Pressable onPress={ () => {
+                    logout();
+                }} style={{width: 100, height: 50, backgroundColor: "red"}}>
+                    <Text style={{color: "#fff", fontSize:  20, alignItems:"center", textAlign: "center"}}>Logout</Text>
+                </Pressable>
 
                 <View col style={styles.containerFeatures}>
                     <View style={styles.containerFeature} >
@@ -51,7 +62,7 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    
+
                                     navigation.navigate("Scan")
 
                                 }}
@@ -74,7 +85,7 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                   
+
                                     navigation.navigate("ManagePrescriptions")
 
                                 }}
@@ -97,9 +108,9 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    
+
                                     navigation.navigate("ReminderScheduling")
-                                    
+
 
                                 }}
                             >
@@ -257,10 +268,10 @@ const styles = StyleSheet.create(
             flexDirection: "column",
             gap: 20
         },
-        helloUserContainer:{
+        helloUserContainer: {
             alignItems: "flex-end",
         },
-        helloUserText:{
+        helloUserText: {
             fontFamily: 'Inter-Bold',
             color: "white",
             fontSize: 20,

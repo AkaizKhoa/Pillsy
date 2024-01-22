@@ -34,7 +34,7 @@ export default function SignupLogin3() {
       <View style={styles.arrowBackContainer}>
         <Pressable style={({ pressed }) => pressed && styles.pressedItem}
           onPress={() => {
-            navigation.navigate("SignUpLogin1")
+            navigation.navigate("SignupLogin1")
 
         }}>
           <ArrowBackLeft />

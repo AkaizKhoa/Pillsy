@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import React, { useState } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
+import React, { useState, useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MainScreen from "../../components/MainScreen";
 import { NavigationContainer } from "@react-navigation/native";
@@ -11,27 +11,45 @@ import ReminderScheduling from "../../components/ReminderScheduling";
 import SignupLogin1 from "../../components/SignupLogin1";
 import SignupLogin2 from "../../components/SignupLogin2";
 import SignupLogin3 from "../../components/SignupLogin3";
+import { AuthContext } from "../../context/AuthContext";
 
 const HomeNavigator = () => {
 
   const HomeStack = createNativeStackNavigator();
 
-  const [auth, setAuth] = useState(true);
+  // const [auth, setAuth] = useState(false);
+
+  const { isLoading, userToken } = useContext(AuthContext)
+
+
+  if (isLoading) {
+   return(
+    <View style={{ flex: "1", justifyContent: "center", alignItems: "center" }}>
+    <ActivityIndicator size={"large"} />
+  </View>
+   );
+  }
 
 
   return (
+
     <NavigationContainer>
       <HomeStack.Navigator
-       initialRouteName="MainScreen" 
-       screenOptions={{ 
-        headerTransparent: true, 
-        headerShown: false, 
-        contentStyle: { backgroundColor: "#FFF" },
-        animation: "fade_from_bottom" }}>
-        {
-        auth ? (<HomeStack.Screen name="MainScreen" component={MainScreen} />) : (<HomeStack.Screen name="SignUpLogin1" component={SignupLogin1} />)}
-       <HomeStack.Screen name="SignupLogin2" component={SignupLogin2}></HomeStack.Screen>
-       <HomeStack.Screen name="SignupLogin3" component={SignupLogin3}></HomeStack.Screen>
+        initialRouteName="SignupLogin1"
+        screenOptions={{
+          headerTransparent: true,  
+          headerShown: false,
+          contentStyle: { backgroundColor: "#FFF" },
+          animation: "fade"
+        }}>
+
+        {userToken !== null ?  <HomeStack.Screen name="MainScreen" component={MainScreen} /> : <HomeStack.Screen name="SignupLogin1" component={SignupLogin1} />}
+
+        
+       
+
+        <HomeStack.Screen name="SignupLogin2" component={SignupLogin2}></HomeStack.Screen>
+        <HomeStack.Screen name="SignupLogin3" component={SignupLogin3}></HomeStack.Screen>
         <HomeStack.Screen name="Scan" component={Scan} ></HomeStack.Screen>
         <HomeStack.Screen name="ManagePrescriptions" component={ManagePrescriptions}></HomeStack.Screen>
         <HomeStack.Screen name="CustomerSupport1" component={CustomerSupport1}></HomeStack.Screen>
