@@ -101,7 +101,6 @@ export default function Scan() {
                 <Pressable style={({ pressed }) => pressed && styles.pressedItem} 
                 onPress={() => {
                     navigation.navigate("MainScreen")
-
                 }}>
                     <ArrowBackLeft />
                 </Pressable>
