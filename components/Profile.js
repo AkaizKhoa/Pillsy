@@ -16,7 +16,17 @@ import {
 } from "@expo/vector-icons";
 import React from "react";
 
+
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
+
 const Profile = () => {
+
+  const { logout } = useContext(AuthContext);
+  const { userInfo } = useContext(AuthContext);
+
+
   return (
     <ScrollView contentContainerStyle={{ flex: 1 }}>
       <View style={styles.container}>
@@ -50,7 +60,7 @@ const Profile = () => {
                   User Name
                 </Text>
                 <Text style={{ fontSize: 16, color: "#9DA7C0", marginTop: 5 }}>
-                  user@gmail.com
+                  {userInfo.Email}
                 </Text>
               </View>
             </View>
@@ -157,6 +167,8 @@ const Profile = () => {
             style={styles.touchAbleSettingItem4}
             onPress={() => {
               // Add your action here
+              logout();
+
             }}
           >
             <View style={styles.containerSettingsItem2}>

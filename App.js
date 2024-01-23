@@ -23,6 +23,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeNavigator from "./routers/navigators/HomeNavigator";
 import ReminderScheduling from "./components/ReminderScheduling";
 
+import { AuthProvider } from "./context/AuthContext";
+
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -78,7 +82,10 @@ export default function App() {
         style={[styles.container, { marginTop: marginTopDistance }]}
         onLayout={onLayoutRootView}
       >
+        <AuthProvider>
+
         <HomeNavigator></HomeNavigator>
+        </AuthProvider>
       </View>
     </>
   );
