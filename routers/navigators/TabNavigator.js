@@ -39,7 +39,6 @@ const TabNavigator = () => {
         component={Profile}
         options={{
           tabBarBadgeStyle: { backgroundColor: "orange" },
-          tabBarBadge: "!",
           tabBarIcon: ({ color, size }) => (
             <Feather name="user" size={size} color={color} />
           ),

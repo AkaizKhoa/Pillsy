@@ -22,7 +22,6 @@ import { AuthContext } from "../context/AuthContext";
 export default function MainScreen() {
     const { userInfo } = useContext(AuthContext);
     const navigation = useNavigation();
-    console.log(userInfo);
 
     const [fontsLoaded] = useFonts({
         "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
