@@ -57,7 +57,8 @@ const Profile = () => {
               </View>
               <View style={styles.userInfoContainer}>
                 <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                  User Name
+                {userInfo.Username}
+
                 </Text>
                 <Text style={{ fontSize: 16, color: "#9DA7C0", marginTop: 5 }}>
                   {userInfo.Email}
