@@ -39,7 +39,7 @@ const HomeNavigator = () => {
           headerTransparent: true,
           headerShown: false,
           contentStyle: { backgroundColor: "#FFF" },
-          animation: "ios",
+          animation: "fade_from_bottom",
         }}
       >
         

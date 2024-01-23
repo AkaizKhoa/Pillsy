@@ -15,8 +15,7 @@ import { useFonts } from "expo-font";
 
 
 import { useNavigation } from '@react-navigation/native';
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+
 
 
 export default function MainScreen() {
@@ -31,7 +30,6 @@ export default function MainScreen() {
         return undefined;
     }
 
-    const { logout } = useContext(AuthContext);
 
 
     return (
@@ -50,11 +48,7 @@ export default function MainScreen() {
                         <Text style={styles.textWelcome}>Welcome to Pillsy!</Text>
                     </View>
                 </View>
-                <Pressable onPress={ () => {
-                    logout();
-                }} style={{width: 100, height: 50, backgroundColor: "red"}}>
-                    <Text style={{color: "#fff", fontSize:  20, alignItems:"center", textAlign: "center"}}>Logout</Text>
-                </Pressable>
+              
 
                 <View col style={styles.containerFeatures}>
                     <View style={styles.containerFeature} >
