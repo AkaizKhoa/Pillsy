@@ -1,8 +1,8 @@
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, SafeAreaView, ActivityIndicator } from "react-native";
 import React, { useState, useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import MainScreen from "../../components/MainScreen";
 import { NavigationContainer } from "@react-navigation/native";
+import MainScreen from "../../components/MainScreen";
 import Scan from "../../components/Scan";
 import ManagePrescriptions from "../../components/ManagePrescriptions";
 import CustomerSupport1 from "../../components/CustomerSupport1";
@@ -11,13 +11,12 @@ import ReminderScheduling from "../../components/ReminderScheduling";
 import SignupLogin1 from "../../components/SignupLogin1";
 import SignupLogin2 from "../../components/SignupLogin2";
 import SignupLogin3 from "../../components/SignupLogin3";
+import TabNavigator from "./TabNavigator";
 import { AuthContext } from "../../context/AuthContext";
 
 const HomeNavigator = () => {
-
   const HomeStack = createNativeStackNavigator();
 
-  // const [auth, setAuth] = useState(false);
 
   const { isLoading, userToken } = useContext(AuthContext)
 
@@ -37,25 +36,41 @@ const HomeNavigator = () => {
       <HomeStack.Navigator
         initialRouteName="SignupLogin1"
         screenOptions={{
-          headerTransparent: true,  
+          headerTransparent: true,
           headerShown: false,
           contentStyle: { backgroundColor: "#FFF" },
-          animation: "fade"
-        }}>
-
-        {userToken !== null ?  <HomeStack.Screen name="MainScreen" component={MainScreen} /> : <HomeStack.Screen name="SignupLogin1" component={SignupLogin1} />}
-
+          animation: "ios",
+        }}
+      >
         
-       
 
-        <HomeStack.Screen name="SignupLogin2" component={SignupLogin2}></HomeStack.Screen>
-        <HomeStack.Screen name="SignupLogin3" component={SignupLogin3}></HomeStack.Screen>
-        <HomeStack.Screen name="Scan" component={Scan} ></HomeStack.Screen>
-        <HomeStack.Screen name="ManagePrescriptions" component={ManagePrescriptions}></HomeStack.Screen>
-        <HomeStack.Screen name="CustomerSupport1" component={CustomerSupport1}></HomeStack.Screen>
-        <HomeStack.Screen name="CustomerFeedBack1" component={CustomerFeedBack1}></HomeStack.Screen>
-        <HomeStack.Screen name="ReminderScheduling" component={ReminderScheduling}></HomeStack.Screen>
+{userToken !== null ?  <HomeStack.Screen name="MainScreen" component={TabNavigator} /> : <HomeStack.Screen name="SignupLogin1" component={SignupLogin1} />}
 
+        <HomeStack.Screen
+          name="SignupLogin2"
+          component={SignupLogin2}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="SignupLogin3"
+          component={SignupLogin3}
+        ></HomeStack.Screen>
+        <HomeStack.Screen name="Scan" component={Scan}></HomeStack.Screen>
+        <HomeStack.Screen
+          name="ManagePrescriptions"
+          component={ManagePrescriptions}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="CustomerSupport1"
+          component={CustomerSupport1}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="CustomerFeedBack1"
+          component={CustomerFeedBack1}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="ReminderScheduling"
+          component={ReminderScheduling}
+        ></HomeStack.Screen>
       </HomeStack.Navigator>
     </NavigationContainer>
   );
