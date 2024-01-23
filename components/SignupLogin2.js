@@ -49,7 +49,7 @@ const [password, setPassword] = useState(null);
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold", marginBottom: 50 }]}
           placeholder="abc@gmail.com"
-          keyboardType="email-address"
+          
           placeholderTextColor={"#224E9A"}
           value={email}
           onChangeText={text => setEmail(text)}

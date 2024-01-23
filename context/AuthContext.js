@@ -8,18 +8,28 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userToken, setUserToken] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  // const [userInfo, setUserInfo] = useState(null);
 
   const isLogggedIn = async () => {
     try {
+      // setIsLoading(true);
+      // let userInfo = await AsyncStorage.getItem("userInfo");
+      // let userToken = await AsyncStorage.getItem("userToken");
+      // userInfo = JSON.parse(userInfo);
+      // if (userInfo) {
+        // setUserToken(userToken);
+        // setUserInfo(userInfo);
+      // }
+
+
+
       setIsLoading(true);
-      let userInfo = await AsyncStorage.getItem("userInfo");
+      // let userInfo = await AsyncStorage.getItem("userInfo");
       let userToken = await AsyncStorage.getItem("userToken");
-      userInfo = JSON.parse(userInfo);
-      if (userInfo) {
+      // userInfo = JSON.parse(userInfo);
         setUserToken(userToken);
-        setUserInfo(userInfo);
-      }
+        // setUserInfo(userInfo);
+
     } catch (error) {
       console.log(`isLogged in error ${error}`);
     } finally {
@@ -31,20 +41,26 @@ export const AuthProvider = ({ children }) => {
     isLogggedIn();
   }, []);
 
-  const login = (username, password) => {
+  const login = (email, password) => {
     setIsLoading(true);
+    console.log(email);
+    console.log(password);
     axios
-      .post(`${BASE_URL}/jwt-auth/v1/token`, {
-        username,
+      .post(`${BASE_URL}/api/v1/auth/login`, {
+        email,
         password,
       })
       .then((res) => {
         console.log(res.data);
-        let userInfo = res.data;
-        setUserInfo(userInfo);
-        setUserToken(userInfo.data.token);
-        AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
-        AsyncStorage.setItem("userToken", userInfo.data.token);
+        // let userInfo = res.data;
+        // setUserInfo(userInfo);
+        // setUserToken(userInfo.data.token);
+        setUserToken(res.data);
+
+        // AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+        // AsyncStorage.setItem("userToken", userInfo.data.token);
+        AsyncStorage.setItem("userToken", res.data);
+
       })
       .catch((e) => {
         console.log(`Login error ${e}`);
@@ -57,7 +73,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setIsLoading(true);
     setUserToken(null);
-    AsyncStorage.removeItem("userInfo");
+    // AsyncStorage.removeItem("userInfo");
     AsyncStorage.removeItem("userToken");
     setIsLoading(false);
   };

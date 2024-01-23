@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 export default function SignupLogin1() {
+    
     const navigation = useNavigation();
 
     return (
