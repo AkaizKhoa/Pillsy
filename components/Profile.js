@@ -88,7 +88,7 @@ const Profile = () => {
           <TouchableOpacity
             style={styles.touchAbleSettingItem}
             onPress={() => {
-              // Add your action here
+              navigation.navigate("ChangePassword");
             }}
           >
             <View style={styles.containerSettingsItem}>
