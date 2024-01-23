@@ -13,6 +13,7 @@ import SignupLogin2 from "../../components/SignupLogin2";
 import SignupLogin3 from "../../components/SignupLogin3";
 import TabNavigator from "./TabNavigator";
 import { AuthContext } from "../../context/AuthContext";
+import ProfileUserDetail from "../../components/ProfileUserDetail";
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
@@ -70,6 +71,15 @@ const HomeNavigator = () => {
         <HomeStack.Screen
           name="ReminderScheduling"
           component={ReminderScheduling}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="ProfileUserDetail"
+          component={ProfileUserDetail}
+          options={{
+            headerShown: true,
+            headerTitle: "Profile Detail",
+            headerStyle: { backgroundColor: "#FFF" },
+          }}
         ></HomeStack.Screen>
       </HomeStack.Navigator>
     </NavigationContainer>

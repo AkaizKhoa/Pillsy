@@ -15,7 +15,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import React from "react";
-
+import { useNavigation } from "@react-navigation/native";
 
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -25,7 +25,7 @@ const Profile = () => {
 
   const { logout } = useContext(AuthContext);
   const { userInfo } = useContext(AuthContext);
-
+  const navigation = useNavigation();
 
   return (
     <ScrollView contentContainerStyle={{ flex: 1 }}>
@@ -47,7 +47,7 @@ const Profile = () => {
           <TouchableOpacity
             style={styles.touchAbleItemUpper}
             onPress={() => {
-              // navigation.navigate("Scan") Nav tới User Settings
+              navigation.navigate("ProfileUserDetail");
             }}
           >
             <View style={styles.containerUser}>

@@ -15,12 +15,14 @@ import { useFonts } from "expo-font";
 
 
 import { useNavigation } from '@react-navigation/native';
-
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 
 export default function MainScreen() {
-
+    const { userInfo } = useContext(AuthContext);
     const navigation = useNavigation();
+    console.log(userInfo);
 
     const [fontsLoaded] = useFonts({
         "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
@@ -42,7 +44,7 @@ export default function MainScreen() {
                 <View style={styles.containerText}>
                     <Text style={[styles.pillsy, { fontFamily: "Inter-Bold" }]}>Pillsy</Text>
                     <View style={styles.helloUserContainer}>
-                        <Text style={styles.helloUserText}>Hello, <Text style={{ color: '#FF6AB2' }}>User's Name</Text> 🙋🏻‍♂️</Text>
+                        <Text style={styles.helloUserText}>Hello, <Text style={{ color: '#FF6AB2' }}>{userInfo.Username}</Text> 🙋🏻‍♂️</Text>
                     </View>
                     <View style={[styles.boxWelcome, styles.shadowBoxWelcome]}>
                         <Text style={styles.textWelcome}>Welcome to Pillsy!</Text>
