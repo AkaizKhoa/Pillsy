@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       userInfo = JSON.parse(userInfo);
       setUserToken(userToken);
       setUserInfo(userInfo);
-
+      console.log(userInfo);
     } catch (error) {
       console.log(`isLogged in error ${error}`);
     } finally {
