@@ -163,7 +163,7 @@ const Profile = () => {
               <Text
                 style={{
                   fontSize: 16,
-                  color: "#282828",
+                  color: "#fff",
                   textAlign: "center",
                   fontWeight: "bold",
                 }}
