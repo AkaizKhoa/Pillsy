@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   View,
   Image,
+  Platform,
 } from "react-native";
 import {
   Feather,
@@ -61,7 +62,6 @@ export default function ProfileUserDetail() {
 
 
 
-  
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -135,7 +135,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    margin: 20,
+    marginTop: Platform.OS === "ios" ? 20 : 80,
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
   containerUserPhoto: {
     // position: "relative",

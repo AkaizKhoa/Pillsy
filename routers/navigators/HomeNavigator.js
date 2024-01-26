@@ -14,6 +14,7 @@ import SignupLogin3 from "../../components/SignupLogin3";
 import TabNavigator from "./TabNavigator";
 import { AuthContext } from "../../context/AuthContext";
 import ProfileUserDetail from "../../components/ProfileUserDetail";
+import ChangePassword from "../../components/ChangePassword";
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
@@ -81,6 +82,16 @@ const HomeNavigator = () => {
             headerStyle: { backgroundColor: "#FFF" },
           }}
         ></HomeStack.Screen>
+        <HomeStack.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+          headerStyle: { backgroundColor: "#FFF" },
+        }}
+        >
+        </HomeStack.Screen>
       </HomeStack.Navigator>
     </NavigationContainer>
   );
