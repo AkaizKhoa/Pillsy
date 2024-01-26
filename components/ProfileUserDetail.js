@@ -22,44 +22,11 @@ import { AuthContext } from "../context/AuthContext";
 
 export default function ProfileUserDetail() {
   const [isLoading, setIsLoading] = useState(false);
-  const [profile, setProfile] = useState(null);
+  // const [profile, setProfile] = useState(null);
 
   const { userInfo } = useContext(AuthContext);
   const { userToken } = useContext(AuthContext);
-
-  
-
-
-  useEffect(() => {
-    // Define an async function inside the useEffect
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-  
-        // You can await asynchronous operations here
-        const response = await axios.get(`${BASE_URL}/api/v1/patients/${userInfo.AccountId}`, {
-          headers: {
-            'Authorization': 'Bearer ' + userToken
-          }
-        });
-  
-        // Process the data or update the state
-        console.log(JSON.stringify(response));
-      } catch (error) {
-        // Handle errors if necessary
-        console.error('Error fetching data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    // Call the async function immediately
-    fetchData();
-  
-    // Specify dependencies if needed, like userInfo.AccountId or userToken
-  }, []);
-  
-
+  const { profile } = useContext(AuthContext);
 
 
 
@@ -96,28 +63,28 @@ export default function ProfileUserDetail() {
             <View style={styles.userInformationBoxItem}>
               <Text style={{ fontSize: 14, color: "#858C94" }}>Full Name</Text>
               <Text style={{ fontWeight: "bold", fontSize: 14 }}>
-                User's Name
+              {profile && profile.firstName} {profile && profile.lastName}
               </Text>
             </View>
             {/* EMAIL */}
             <View style={styles.userInformationBoxItem}>
               <Text style={{ fontSize: 14, color: "#858C94" }}>Email</Text>
               <Text style={{ fontWeight: "bold", fontSize: 14 }}>
-                username@gmail.com
+                {userInfo.Email}
               </Text>
             </View>
             {/* AGE */}
             <View style={styles.userInformationBoxItem}>
-              <Text style={{ fontSize: 14, color: "#858C94" }}>Age</Text>
+              <Text style={{ fontSize: 14, color: "#858C94" }}>DateOfBirth</Text>
               <Text style={{ fontWeight: "bold", fontSize: 14 }}>
-                User's Age
+              {profile && profile.dateOfBirth}
               </Text>
             </View>
             {/* GENDER */}
             <View style={[styles.userInformationBoxItem, { marginBottom: 0 }]}>
               <Text style={{ fontSize: 14, color: "#858C94" }}>Gender</Text>
               <Text style={{ fontWeight: "bold", fontSize: 14 }}>
-                User's Gender
+              {profile && (profile.gender ? "Nữ" : "Nam")}
               </Text>
             </View>
           </View>

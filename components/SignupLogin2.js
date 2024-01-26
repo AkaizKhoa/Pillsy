@@ -99,7 +99,7 @@ const [password, setPassword] = useState(null);
           <Text style={[styles.dontHaveText, { fontFamily: "Inter-Bold" }]}>Don't have an account?</Text>
           <Text style={[styles.signUpText, { fontFamily: "Inter-Bold" }]} 
             onPress={() => {
-              navigation.navigate("SignUpLogin1")
+              navigation.navigate("SignupLogin3")
 
           }}>Sign up</Text>
         </View>

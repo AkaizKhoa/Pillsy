@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   View,
   Text,
@@ -20,6 +20,10 @@ import { useNavigation } from '@react-navigation/native';
 export default function SignupLogin3() {
 
   const navigation = useNavigation();
+
+
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
 
   const [fontsLoaded] = useFonts({
@@ -57,6 +61,8 @@ export default function SignupLogin3() {
             placeholder="abc@gmail.com"
             keyboardType="email-address"
             placeholderTextColor={"#224E9A"}
+            value={email}
+            onChangeText={text => setEmail(text)}
           />
         </View>
         <View>
@@ -69,6 +75,8 @@ export default function SignupLogin3() {
             placeholder="●●●●●●●"
             secureTextEntry={true}
             placeholderTextColor={"#224E9A"}
+            value={password}
+            onChangeText={text => setPassword(text)}
           />
         </View>
         <View>
@@ -78,6 +86,8 @@ export default function SignupLogin3() {
             placeholder="●●●●●●●"
             secureTextEntry={true}
             placeholderTextColor={"#224E9A"}
+            value={password}
+            onChangeText={text => setPassword(text)}
           />
         </View>
       </View>
@@ -85,7 +95,10 @@ export default function SignupLogin3() {
         <TouchableOpacity
           style={styles.buttonSignUp}
           onPress={() => {
-            // Handle SignUp button press
+            navigation.navigate("InputInformation1", {
+              email: email,
+              password: password
+            })
           }}
         >
           <Text style={[styles.buttonTextSignUp, { fontFamily: "Inter-Bold" }]}>
@@ -111,7 +124,11 @@ export default function SignupLogin3() {
           <Text style={[styles.alreadyHaveText, { fontFamily: "Inter-Bold" }]}>
             Already have an account?
           </Text>
-          <Text style={[styles.signInText, { fontFamily: "Inter-Bold" }]}>
+          <Text style={[styles.signInText, { fontFamily: "Inter-Bold" }]}
+            onPress={() => {
+              navigation.navigate("SignupLogin2")
+
+          }}>
             Sign in
           </Text>
         </View>

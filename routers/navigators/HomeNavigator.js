@@ -15,6 +15,7 @@ import TabNavigator from "./TabNavigator";
 import { AuthContext } from "../../context/AuthContext";
 import ProfileUserDetail from "../../components/ProfileUserDetail";
 import ChangePassword from "../../components/ChangePassword";
+import InputInformation1 from "../../components/InputInformation1"
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
@@ -92,6 +93,11 @@ const HomeNavigator = () => {
         }}
         >
         </HomeStack.Screen>
+        <HomeStack.Screen
+          name="InputInformation1"
+          component={InputInformation1}
+         
+        ></HomeStack.Screen>
       </HomeStack.Navigator>
     </NavigationContainer>
   );
