@@ -18,15 +18,14 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(true);
       let userInfo = await AsyncStorage.getItem("userInfo");
       let userToken = await AsyncStorage.getItem("userToken");
-      let storedProfile = await AsyncStorage.getItem("profile");
+      let profile = await AsyncStorage.getItem("profile");
   
       userInfo = JSON.parse(userInfo);
       setUserToken(userToken);
       setUserInfo(userInfo);
   
       // Parse the stored profile back into an object
-      setProfile(JSON.parse(storedProfile));
-      console.log(userInfo);
+      setProfile(JSON.parse(profile));
     } catch (error) {
       console.log(`isLogged in error ${error}`);
     } finally {
@@ -38,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     isLogggedIn();
   }, []);
 
-  const login = (email, password) => {
+  const login =  (email, password)  => {
     setIsLoading(true);
     axios
       .post(`${BASE_URL}/api/v1/auth/login`, {
@@ -46,13 +45,13 @@ export const AuthProvider = ({ children }) => {
         password,
       })
       .then((res) => {
-        console.log(res.data);
         let userInfo = jwtDecode(res.data);
         setUserInfo(userInfo);
         setUserToken(res.data);
-        fetchData()
         AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
         AsyncStorage.setItem("userToken", res.data);
+
+        fetchData(userInfo.PatientId)
 
       })
       .catch((e) => {
@@ -75,11 +74,11 @@ export const AuthProvider = ({ children }) => {
 
 
 
-  const fetchData = async () => {
+  const fetchData = async (patientId) => {
     try {
       setIsLoading(true);
   
-      const response = await axios.get(`${BASE_URL}/api/v1/patients/${userInfo.PatientId}`, {
+      const response = await axios.get(`${BASE_URL}/api/v1/patients/${patientId}`, {
         headers: {
           'Authorization': 'Bearer ' + userToken
         }
@@ -88,9 +87,11 @@ export const AuthProvider = ({ children }) => {
       let profile = response.data;
       setProfile(profile);
   
+      console.log('====================================');
+      console.log(profile);
+      console.log('====================================');
       // Convert the profile object to a JSON string before storing in AsyncStorage
       AsyncStorage.setItem("profile", JSON.stringify(profile));
-      console.log(profile);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
