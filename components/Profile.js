@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     height: "10%",
     position: "absolute",
     top: 350,
-    backgroundColor: "#A1A2D8",
+    backgroundColor: "#017AFE",
     textAlign: "center",
     justifyContent: "center",
     alignItems: "center",
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   containerUpper: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#A1A2D8",
+    backgroundColor: "#017AFE",
     flexDirection: "column",
     width: "100%",
     height: 200,

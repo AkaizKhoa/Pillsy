@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     maxWidth: "85%",
   },
   containerButton: {
-    backgroundColor: "#A1A2D8",
+    backgroundColor: "#017AFE",
     width: "100%",
     height: 50,
     borderRadius: 10,
