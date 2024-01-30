@@ -1,26 +1,74 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, Pressable } from "react-native";
-import { useState } from "react";
+import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, FlatList, Image } from "react-native";
+import { useState, useEffect, useContext } from "react";
 import DotCard from "../assets/icon/dot-card.svg"
 import IconSearch from "../assets/icon/search-icon.svg"
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 
 import { useNavigation } from '@react-navigation/native';
+import { BASE_URL } from "../config";
+import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
+
 
 export default function ManagePrescriptions() {
 
     const [prescription, setPrescription] = useState("");
+    const [listPres, setListPres] = useState([])
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigation = useNavigation();
 
+    const { userInfo } = useContext(AuthContext);
+    const { userToken } = useContext(AuthContext);
+
+
+  
+    useEffect(() => {
+        const abortController = new AbortController();
+        const url = `${BASE_URL}/api/v1/prescription-management/prescriptions/patient/${userInfo.PatientId}/all-prescription`;
+    
+        const fetchData = async () => {
+          try {
+            setIsLoading(true)
+            const response = await axios.get(url, { signal: abortController.signal, headers: {
+                'Authorization': 'Bearer ' + userToken
+              } });
+            console.log(response.data);
+            const listPres = response.data
+            setListPres(listPres)
+          } catch (error) {
+            if(abortController.signal.aborted){
+              console.log('Data fetching cancelled');
+            }else{
+             // Handle error
+            }
+          }finally{
+            setIsLoading(false)
+
+          }
+        };
+    
+        fetchData();
+    
+        return () => abortController.abort("Data fetching cancelled");
+      }, []);
+      
 
     return (
         <View style={styles.container}>
-            <View style={styles.arrowBackContainer}>
-                <Pressable style={({ pressed }) => pressed && styles.pressedItem} 
-                onPress={() => {
-                    navigation.navigate("MainScreen")
+           {isLoading ? (
+            <View style={{flex: 1, justifyContent: "center", alignItems: "center", gap: 20}}>
+                <Image source={require("../assets/loading/prescription.gif")} />
+                <Text style={{fontSize: 20, fontWeight: "600"}}>Loading....</Text>
+            </View>
+           ): (
+            <View>
+                 <View style={styles.arrowBackContainer}>
+                <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+                    onPress={() => {
+                        navigation.navigate("MainScreen")
 
-                }}>
+                    }}>
                     <ArrowBackLeft />
                 </Pressable>
             </View>
@@ -37,45 +85,34 @@ export default function ManagePrescriptions() {
             </View>
 
 
-            <ScrollView style={styles.listPrescription}>
-                <View style={styles.cardPrescription}>
-                    <DotCard ></DotCard>
-                    <View style={styles.groupText}>
-                        <Text style={styles.title}>
-                            Cardiovascular prescription
-                        </Text>
-                        <Text style={styles.context}>
-                            • Acebutolol (Sectral)
-                        </Text>
-                        <Text style={styles.context}>
-                            • Atenolol (Tenormin)
-                        </Text >
-                        <Text style={styles.context}>
-                            • Betaxolol (Kerlone)
-                        </Text>
+            <FlatList contentContainerStyle={styles.listPrescription} data={listPres}
+            showsVerticalScrollIndicator={false}
+                renderItem={({ item: data, index }) => (
+                    <View style={styles.cardPrescription}>
+                        <DotCard ></DotCard>
+                        <View style={styles.groupText}>
+                            <Text style={styles.title}>
+                                Don thuoc
+                            </Text>
+                            <Text style={styles.context}>
+                                Trieu chung: {data.diagnosis}
+                            </Text>
+                            <Text style={styles.context}>
+                                {/* {item.detailPres[1]} */}
+                            </Text >
+
+                        </View>
                     </View>
-                </View>
-                <View style={styles.cardPrescription}>
-                    <DotCard></DotCard>
-                    <View style={styles.groupText}>
-                        <Text style={styles.title}>
-                            Stomach prescription
-                        </Text>
-                        <Text style={styles.context}>
-                            • Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole Omeprazole
-                        </Text>
-                        <Text style={styles.context}>
-                            • Pantoprazole sodium Pantoprazole sodium Pantoprazole sodium Pantoprazole sodium Pantoprazole sodiumPantoprazole sodium
-                        </Text>
-                        <Text style={styles.context}>
-                            • Famotidine
-                        </Text>
-                    </View>
-                </View>
+                )}
+                keyExtractor={(data, index) => index.toString()}
+            />
 
 
 
-            </ScrollView>
+            </View>
+           )}
+
+
         </View>
     )
 }
