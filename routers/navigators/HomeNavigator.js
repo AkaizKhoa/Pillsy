@@ -15,26 +15,25 @@ import TabNavigator from "./TabNavigator";
 import { AuthContext } from "../../context/AuthContext";
 import ProfileUserDetail from "../../components/ProfileUserDetail";
 import ChangePassword from "../../components/ChangePassword";
-import InputInformation1 from "../../components/InputInformation1"
+import InputInformation1 from "../../components/InputInformation1";
+import ForgotPassword1 from "../../components/ForgotPassword1";
+import ForgotPassword2 from "../../components/ForgotPassword2";
+import ForgotPassword3 from "../../components/ForgotPassword3";
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
 
-
-  const { isLoading, userToken } = useContext(AuthContext)
-
+  const { isLoading, userToken } = useContext(AuthContext);
 
   if (isLoading) {
-   return(
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-    <ActivityIndicator size={"large"} />
-  </View>
-   );
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size={"large"} />
+      </View>
+    );
   }
 
-
   return (
-
     <NavigationContainer>
       <HomeStack.Navigator
         initialRouteName="SignupLogin1"
@@ -42,12 +41,14 @@ const HomeNavigator = () => {
           headerTransparent: true,
           headerShown: false,
           contentStyle: { backgroundColor: "#FFF" },
-          animation: "fade_from_bottom",
+          animation: "default",
         }}
       >
-        
-
-{userToken !== null ?  <HomeStack.Screen name="MainScreen" component={TabNavigator} /> : <HomeStack.Screen name="SignupLogin1" component={SignupLogin1} />}
+        {userToken !== null ? (
+          <HomeStack.Screen name="MainScreen" component={TabNavigator} />
+        ) : (
+          <HomeStack.Screen name="SignupLogin1" component={SignupLogin1} />
+        )}
 
         <HomeStack.Screen
           name="SignupLogin2"
@@ -84,19 +85,44 @@ const HomeNavigator = () => {
           }}
         ></HomeStack.Screen>
         <HomeStack.Screen
-        name="ChangePassword"
-        component={ChangePassword}
-        options={{
-          headerShown: true,
-          headerTitle: "",
-          headerStyle: { backgroundColor: "#FFF" },
-        }}
-        >
-        </HomeStack.Screen>
+          name="ChangePassword"
+          component={ChangePassword}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#FFF" },
+          }}
+        ></HomeStack.Screen>
         <HomeStack.Screen
           name="InputInformation1"
           component={InputInformation1}
-         
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="ForgotPassword1"
+          component={ForgotPassword1}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#FFF" },
+          }}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="ForgotPassword2"
+          component={ForgotPassword2}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#FFF" },
+          }}
+        ></HomeStack.Screen>
+        <HomeStack.Screen
+          name="ForgotPassword3"
+          component={ForgotPassword3}
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#FFF" },
+          }}
         ></HomeStack.Screen>
       </HomeStack.Navigator>
     </NavigationContainer>

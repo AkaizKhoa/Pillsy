@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -13,17 +13,16 @@ import { useFonts } from "expo-font";
 import GoogleIcon from "../assets/icon/google_icon.svg";
 import FaceBookIcon from "../assets/icon/facebook_icon.svg";
 import AppleIcon from "../assets/icon/apple_icon.svg";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
 
 export default function SignupLogin2() {
-
   const navigation = useNavigation();
-// using context 
-const {login} = useContext(AuthContext);
+  // using context
+  const { login } = useContext(AuthContext);
 
-const [email, setEmail] = useState(null);
-const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
 
   const [fontsLoaded] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
@@ -32,8 +31,6 @@ const [password, setPassword] = useState(null);
   if (!fontsLoaded) {
     return undefined;
   }
-
-
 
   return (
     <View style={styles.container}>
@@ -49,10 +46,9 @@ const [password, setPassword] = useState(null);
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold", marginBottom: 50 }]}
           placeholder="abc@gmail.com"
-          
           placeholderTextColor={"#224E9A"}
           value={email}
-          onChangeText={text => setEmail(text)}
+          onChangeText={(text) => setEmail(text)}
         />
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold" }]}
@@ -60,15 +56,14 @@ const [password, setPassword] = useState(null);
           secureTextEntry={true}
           placeholderTextColor={"#224E9A"}
           value={password}
-          onChangeText={text => setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
         />
       </View>
       <View style={styles.containerButton}>
         <TouchableOpacity
           style={styles.buttonLogin}
           onPress={() => {
-
-            login(email, password)
+            login(email, password);
           }}
         >
           <Text style={[styles.buttonTextLogin, { fontFamily: "Inter-Bold" }]}>
@@ -77,9 +72,17 @@ const [password, setPassword] = useState(null);
         </TouchableOpacity>
       </View>
       <View style={styles.containerForgotPassword}>
-        <Text style={[styles.forgotPasswordText, { fontFamily: "Inter-Bold" }]}>
-          Forgot Password?
-        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("ForgotPassword1");
+          }}
+        >
+          <Text
+            style={[styles.forgotPasswordText, { fontFamily: "Inter-Bold" }]}
+          >
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.containerOr}>
         <Text>━━━━━━━━━ </Text>
@@ -96,12 +99,17 @@ const [password, setPassword] = useState(null);
           <AppleIcon width={40} height={40} style={styles.icon} />
         </View>
         <View style={styles.dontHaveAccContainer}>
-          <Text style={[styles.dontHaveText, { fontFamily: "Inter-Bold" }]}>Don't have an account?</Text>
-          <Text style={[styles.signUpText, { fontFamily: "Inter-Bold" }]} 
+          <Text style={[styles.dontHaveText, { fontFamily: "Inter-Bold" }]}>
+            Don't have an account?
+          </Text>
+          <Text
+            style={[styles.signUpText, { fontFamily: "Inter-Bold" }]}
             onPress={() => {
-              navigation.navigate("SignupLogin3")
-
-          }}>Sign up</Text>
+              navigation.navigate("SignupLogin3");
+            }}
+          >
+            Sign up
+          </Text>
         </View>
       </View>
     </View>
@@ -218,18 +226,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   dontHaveText: {
-    color: '#6079A6', 
+    color: "#6079A6",
     fontSize: 10,
-    fontStyle: 'normal',
+    fontStyle: "normal",
     fontWeight: 700,
     letterSpacing: 2,
     marginRight: 5,
   },
-  signUpText:{
-    color: '#3301E5', 
+  signUpText: {
+    color: "#3301E5",
     fontSize: 11,
-    fontStyle: 'normal',
+    fontStyle: "normal",
     fontWeight: 700,
     letterSpacing: 2,
-  }
+  },
 });
