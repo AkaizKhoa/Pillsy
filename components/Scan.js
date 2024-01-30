@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, Button, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Button, Image, TouchableOpacity, Pressable } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
@@ -9,7 +9,9 @@ import IconCircle2 from '../assets/icon/Ellipse8.svg'
 import IconShare from 'react-native-vector-icons/MaterialCommunityIcons'
 import IconSave from 'react-native-vector-icons/MaterialCommunityIcons'
 import IconDiscard from 'react-native-vector-icons/AntDesign'
+import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 
+import { useNavigation } from '@react-navigation/native';
 
 
 export default function Scan() {
@@ -18,6 +20,9 @@ export default function Scan() {
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [hasMediaLibraryPermission, setHasMediaLibraryPermission] = useState();
   const [photo, setPhoto] = useState();
+
+  const navigation = useNavigation();
+
 
   useEffect(() => {
     (async () => {
@@ -92,6 +97,15 @@ export default function Scan() {
 
   return (
     <View style={styles.container}>
+        <View style={styles.arrowBackContainer}>
+                <Pressable style={({ pressed }) => pressed && styles.pressedItem} 
+                onPress={() => {
+                    navigation.navigate("MainScreen")
+
+                }}>
+                    <ArrowBackLeft />
+                </Pressable>
+            </View>
       <View style={styles.containerText}>
         <Text style={styles.title}>
           Scan prescription
@@ -109,7 +123,8 @@ export default function Scan() {
           <StatusBar style="auto" />
         </Camera>
       </View>
-      <View style={styles.buttonContainer} >
+     <View style={styles.buttonGroup}>
+     <View style={styles.buttonContainer} >
         {/* <Button style={styles.button} title='' onPress={takePic}></Button> */}
         <TouchableOpacity
           style={styles.button}
@@ -122,6 +137,7 @@ export default function Scan() {
 
         </TouchableOpacity>
       </View>
+     </View>
     </View>
   );
 }
@@ -130,17 +146,15 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    alignItems: 'center',
     height: "auto",
     flexDirection: "column",
-    justifyContent: "space-evenly"
-
+    gap: 12
   },
   containerText: {
     width: "100%",
     height: "auto",
     gap: 5,
-    paddingHorizontal: 30
+    paddingHorizontal: 40
   },
   title: {
     fontSize: 30,
@@ -156,6 +170,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'transparent',
+    alignItems: 'center',
+    marginHorizontal: 42,
     borderRadius: 20,
   },
   containerCamera: {
@@ -168,12 +184,20 @@ const styles = StyleSheet.create({
     // backgroundColor: '#000',
     borderRadius: 20,
     width: 80,
+    alignItems: 'center',
 
   },
   button: {
     // backgroundColor: "blue",
     // opacity: 0.5,
     borderRadius: 20,
+    alignItems: 'center',
+
+
+  },
+  buttonGroup:{
+    width: "100%",
+    alignItems: 'center',
 
   },
   groupIconCircle: {
@@ -220,5 +244,10 @@ const styles = StyleSheet.create({
   textFeature:{
     fontSize: 18,
     fontWeight: "500"
+  },
+  arrowBackContainer:{
+    width: 80,
+        marginLeft: 20,
+        marginTop: 50
   }
 });

@@ -1,6 +1,12 @@
 import { View, Text, Image, StyleSheet, Button, SafeAreaView, TouchableOpacity } from "react-native";
 
+import { useNavigation } from '@react-navigation/native';
+
+
 export default function SignupLogin1() {
+    
+    const navigation = useNavigation();
+
     return (
         <View style={styles.container}>
             <View style={styles.containerPillsy}>
@@ -18,7 +24,9 @@ export default function SignupLogin1() {
                 <TouchableOpacity
                     style={styles.buttonLogin}
                     onPress={() => {
-                        // Handle login button press
+                        
+                        navigation.navigate("SignupLogin2")
+
                     }}>
                     <Text style={styles.buttonTextLogin}>Login</Text>
                 </TouchableOpacity>
@@ -26,7 +34,9 @@ export default function SignupLogin1() {
                 <TouchableOpacity
                     style={styles.buttonSignUp}
                     onPress={() => {
-                        // Handle sign-up button press
+                        
+                    navigation.navigate("SignupLogin3")
+
                     }}>
                     <Text style={styles.buttonTextSignUp}>Sign Up</Text>
                 </TouchableOpacity>

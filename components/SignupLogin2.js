@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext, useState} from "react";
 import {
   View,
   Text,
@@ -13,8 +13,18 @@ import { useFonts } from "expo-font";
 import GoogleIcon from "../assets/icon/google_icon.svg";
 import FaceBookIcon from "../assets/icon/facebook_icon.svg";
 import AppleIcon from "../assets/icon/apple_icon.svg";
+import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from "../context/AuthContext";
 
 export default function SignupLogin2() {
+
+  const navigation = useNavigation();
+// using context 
+const {login} = useContext(AuthContext);
+
+const [email, setEmail] = useState(null);
+const [password, setPassword] = useState(null);
+
   const [fontsLoaded] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
@@ -22,6 +32,9 @@ export default function SignupLogin2() {
   if (!fontsLoaded) {
     return undefined;
   }
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.containerWelcome}>
@@ -36,21 +49,26 @@ export default function SignupLogin2() {
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold", marginBottom: 50 }]}
           placeholder="abc@gmail.com"
-          keyboardType="email-address"
+          
           placeholderTextColor={"#224E9A"}
+          value={email}
+          onChangeText={text => setEmail(text)}
         />
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold" }]}
           placeholder="Password"
           secureTextEntry={true}
           placeholderTextColor={"#224E9A"}
+          value={password}
+          onChangeText={text => setPassword(text)}
         />
       </View>
       <View style={styles.containerButton}>
         <TouchableOpacity
           style={styles.buttonLogin}
           onPress={() => {
-            // Handle login button press
+
+            login(email, password)
           }}
         >
           <Text style={[styles.buttonTextLogin, { fontFamily: "Inter-Bold" }]}>
@@ -79,7 +97,11 @@ export default function SignupLogin2() {
         </View>
         <View style={styles.dontHaveAccContainer}>
           <Text style={[styles.dontHaveText, { fontFamily: "Inter-Bold" }]}>Don't have an account?</Text>
-          <Text style={[styles.signUpText, { fontFamily: "Inter-Bold" }]}>Sign up</Text>
+          <Text style={[styles.signUpText, { fontFamily: "Inter-Bold" }]} 
+            onPress={() => {
+              navigation.navigate("SignupLogin3")
+
+          }}>Sign up</Text>
         </View>
       </View>
     </View>

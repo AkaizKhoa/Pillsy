@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { SafeAreaView, StyleSheet, StatusBar } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  StatusBar,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -13,11 +19,23 @@ import CustomerFeedBack1 from "./components/CustomerFeedBack1";
 import Scan from "./components/Scan";
 import CustomerFeedBack2 from "./components/CustomerFeedBack2";
 import ManagePrescriptions from "./components/ManagePrescriptions";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import HomeNavigator from "./routers/navigators/HomeNavigator";
+import ReminderScheduling from "./components/ReminderScheduling";
 
+import { AuthProvider } from "./context/AuthContext";
+
+
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
 
+  //Responsive
+  const { width, height } = useWindowDimensions();
+  //Responsive Value
+  const marginTopDistance = height < 400 ? 5 : 0;
   useEffect(() => {
     async function prepare() {
       try {
@@ -58,10 +76,18 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+    <>
       <StatusBar barStyle="dark-content" />
-      <ManagePrescriptions/>
-    </SafeAreaView>
+      <View
+        style={[styles.container, { marginTop: marginTopDistance }]}
+        onLayout={onLayoutRootView}
+      >
+        <AuthProvider>
+
+        <HomeNavigator></HomeNavigator>
+        </AuthProvider>
+      </View>
+    </>
   );
 }
 
