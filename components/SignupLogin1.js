@@ -1,14 +1,23 @@
 import { View, Text, Image, StyleSheet, Button, SafeAreaView, TouchableOpacity } from "react-native";
 
 import { useNavigation } from '@react-navigation/native';
-
+import { AuthContext } from "../context/AuthContext";
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import React, {useContext} from "react";
 
 export default function SignupLogin1() {
+  const {error} = useContext(AuthContext);
     
     const navigation = useNavigation();
 
     return (
+    <AlertNotificationRoot>
         <View style={styles.container}>
+        {{error} ? Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Fail!',
+          textBody: 'Something is wrong. Try again with email and password valid.',
+        }) : ""}
             <View style={styles.containerPillsy}>
                 <Image style={styles.pillsyImage} source={require('../assets/PillSy-Text.png')}></Image>
             </View>
@@ -42,6 +51,7 @@ export default function SignupLogin1() {
                 </TouchableOpacity>
             </View>
         </View>
+        </AlertNotificationRoot>
     );
 }
 

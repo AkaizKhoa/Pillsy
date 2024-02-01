@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect,  } from "react";
+import React, { useState, useContext, useEffect, } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -23,6 +23,7 @@ import { BASE_URL } from "../config";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 export default function ChangePassword() {
   const [secureTextEntryCurrentPassword, setSecureTextEntryCurrentPassword] =
@@ -34,7 +35,6 @@ export default function ChangePassword() {
     setSecureTextEntryConfirmNewPassword,
   ] = useState(true);
 
-  const [modalVisible, setModalVisible] = useState(false);
 
   const [oldPassword, setOldPassword] = useState(null);
   const [newPassword, setNewPassword] = useState(null);
@@ -71,6 +71,12 @@ export default function ChangePassword() {
     } else if (newPassword.length < 6) {
       errors.newPassword = '*NewPassword must be at least 6 characters.';
     }
+    
+    if (!confirmPassword) {
+      errors.confirmPassword = '*Confirm Password is required.';
+    }else if (confirmPassword !== newPassword) {
+      errors.confirmPassword = '*Confirm Password is not match';
+    }
 
 
     // Set the errors and update form validity 
@@ -98,22 +104,38 @@ export default function ChangePassword() {
           }
         })
         .then((res) => {
-          const statusCode = res.status;
+          // const statusCode = res.status;
           const responseData = res.data;
           console.log("Response Data:", responseData);
-
-          if (statusCode === 200) {
-            setModalVisible(true)
-            
+          console.log("Status" , res.status);
+          if (res.status === 200) {
+            Dialog.show({
+              type: ALERT_TYPE.SUCCESS,
+              title: 'Change password is success!',
+              textBody: 'Password is ready to use ',
+              button: 'close',
+              onPressButton: () => {
+                navigation.navigate('MainScreen'); // Thực hiện điều hướng sau khi đóng Dialog
+              },
+            })
+            setOldPassword(null);
+            setNewPassword(null);
+            setComfirmPassword(null);
             console.log("Password changed successfully");
           } else {
-            console.log("Password change failed");
-
+            return
           }
         }
         )
         .catch((e) => {
-          console.log(`Change pass word error ${e}`);
+          console.log(`Change password error ${e}`);
+          Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Change password is fail!',
+            textBody: 'Something error , try again',
+            button: 'close',
+            
+          })
         })
         .finally(() => {
           setIsLoading(false);
@@ -125,7 +147,6 @@ export default function ChangePassword() {
       // Form is invalid, display error messages 
       console.log('Form has errors. Please correct them.');
     }
-    setModalVisible(true)
   };
 
 
@@ -133,6 +154,8 @@ export default function ChangePassword() {
 
 
   return (
+    <AlertNotificationRoot>
+
     <SafeAreaView style={styles.screen}>
       <ScrollView style={{ flex: 1 }}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
@@ -217,6 +240,8 @@ export default function ChangePassword() {
                   </TouchableOpacity>
                 </View>
                 {/* CONFIRM NEW PASSWORD */}
+                <Text style={styles.error}>{errors.confirmPassword}</Text>
+
                 <View style={styles.containerInput}>
                   <View style={styles.containerInputLeft}>
                     <Feather
@@ -248,7 +273,6 @@ export default function ChangePassword() {
                       color="#282828"
                     />
                   </TouchableOpacity>
-                  <Text style={styles.error}>{errors.confirmPassword}</Text>
                 </View>
               </View>
             </View>
@@ -272,35 +296,13 @@ export default function ChangePassword() {
       </ScrollView>
 
 
+     
 
-      <View style={styles.centeredView}>
-        
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Your's password is changed successfully!</Text>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => {
-                  setModalVisible(!modalVisible),
-                  navigation.navigate("MainScreen")
-                }}>
-                <Text style={styles.textStyle}>OK</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-
-      </View>
 
     </SafeAreaView>
+    </AlertNotificationRoot>
+
+
   );
 }
 
@@ -359,62 +361,8 @@ const styles = StyleSheet.create({
 
 
 
-  centeredView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-    
-  },
 
-// centeredViewTrue:{
-//   justifyContent: 'center',
-//   alignItems: 'center',
-//   marginTop: 22,
-//   position: 'absolute',
-//   top: 0,
-//   left: 0,
-//   width: '100%',
-//   height: '100%',
-//   backgroundColor: 'black',
-//   opacity: 0.5,
-// },
-
-
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
+  
   error: {
     color: 'red',
     fontSize: 13,

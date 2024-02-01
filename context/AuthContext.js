@@ -3,8 +3,9 @@ import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
 import { jwtDecode } from "jwt-decode";
-
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import "core-js/stable/atob";
+import LoadingIndicator from "./LoadingIndicator ";
 
 export const AuthContext = createContext();
 
@@ -45,7 +46,8 @@ export const AuthProvider = ({ children }) => {
         password,
       })
       .then((res) => {
-        let userInfo = jwtDecode(res.data);
+        if(res.status === 200){
+          let userInfo = jwtDecode(res.data);
         setUserInfo(userInfo);
         setUserToken(res.data);
         AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
@@ -53,9 +55,11 @@ export const AuthProvider = ({ children }) => {
 
         fetchData(userInfo.PatientId)
 
+        }
       })
       .catch((e) => {
         console.log(`Login error ${e}`);
+        
       })
       .finally(() => {
         setIsLoading(false);
@@ -100,7 +104,11 @@ export const AuthProvider = ({ children }) => {
   };
   return (
     <AuthContext.Provider value={{ login, logout, isLoading, userToken, userInfo, profile }}>
-      {children}
+       {isLoading ? (
+        <LoadingIndicator text="Loading..." />
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };

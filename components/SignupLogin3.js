@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -24,8 +24,56 @@ export default function SignupLogin3() {
 
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [confirmPassword, setComfirmPassword] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
 
 
+  useEffect(() => {
+
+
+    validateForm();
+  }, [email, password, confirmPassword]);
+
+  const validateForm = () => {
+    let errors = {};
+
+    // Validate name field 
+    if (!email) {
+      errors.email = '*Email is required.';
+    }
+
+    // Validate email field 
+    if (!password) {
+      errors.password = '*Password is required.';
+    } else if (password.length < 6) {
+      errors.password = '*Password must be at least 6 characters.';
+    }
+
+    if (!confirmPassword) {
+      errors.confirmPassword = '*Confirm Password is required.';
+    }else if (confirmPassword !== password) {
+      errors.confirmPassword = '*Confirm Password is not match';
+    }
+
+    // Set the errors and update form validity 
+    setErrors(errors);
+    setIsFormValid(Object.keys(errors).length === 0);
+  };
+
+
+const handleSubmit = () =>  {
+  validateForm()
+  if(isFormValid){
+    navigation.navigate("InputInformation1", {
+      email: email,
+      password: password
+    })
+  }else{
+    return
+  }
+}
+  
   const [fontsLoaded] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
@@ -53,6 +101,8 @@ export default function SignupLogin3() {
       <View style={styles.containerInput}>
         <View>
           <Text style={styles.labelInput}>Email</Text>
+                <Text style={styles.error}>{errors.email}</Text>
+
           <TextInput
             style={[
               styles.input,
@@ -67,6 +117,8 @@ export default function SignupLogin3() {
         </View>
         <View>
           <Text style={styles.labelInput}>Password</Text>
+          <Text style={styles.error}>{errors.password}</Text>
+
           <TextInput
             style={[
               styles.input,
@@ -81,13 +133,15 @@ export default function SignupLogin3() {
         </View>
         <View>
           <Text style={styles.labelInput}>Confirm Password</Text>
+          <Text style={styles.error}>{errors.confirmPassword}</Text>
+
           <TextInput
             style={[styles.input, { fontFamily: "Inter-Bold" }]}
             placeholder="●●●●●●●"
             secureTextEntry={true}
             placeholderTextColor={"#224E9A"}
-            value={password}
-            onChangeText={text => setPassword(text)}
+            value={confirmPassword}
+            onChangeText={text => setComfirmPassword(text)}
           />
         </View>
       </View>
@@ -95,10 +149,7 @@ export default function SignupLogin3() {
         <TouchableOpacity
           style={styles.buttonSignUp}
           onPress={() => {
-            navigation.navigate("InputInformation1", {
-              email: email,
-              password: password
-            })
+            handleSubmit();
           }}
         >
           <Text style={[styles.buttonTextSignUp, { fontFamily: "Inter-Bold" }]}>
@@ -261,5 +312,12 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: 700,
     letterSpacing: 2,
+  },
+
+  //error
+  error: {
+    color: 'red',
+    fontSize: 13,
+    fontWeight: "600"
   },
 });

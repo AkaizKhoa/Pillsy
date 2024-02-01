@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,22 +8,49 @@ import {
   SafeAreaView,
   TouchableOpacity,
   TextInput,
+  Alert
 } from "react-native";
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import { useFonts } from "expo-font";
 import GoogleIcon from "../assets/icon/google_icon.svg";
 import FaceBookIcon from "../assets/icon/facebook_icon.svg";
 import AppleIcon from "../assets/icon/apple_icon.svg";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../context/AuthContext";
-
 export default function SignupLogin2() {
   const navigation = useNavigation();
   // using context
   const { login } = useContext(AuthContext);
-
+  const [errors, setErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
+
+  useEffect(() => {
+
+
+    validateForm();
+  }, [email, password]);
+
+  const validateForm = () => {
+    let errors = {};
+
+    // Validate name field 
+    if (!email) {
+      errors.email = '*Email is required.';
+    }
+
+    // Validate email field 
+    if (!password) {
+      errors.password = '*Password is required.';
+    }
+
+
+    // Set the errors and update form validity 
+    setErrors(errors);
+    setIsFormValid(Object.keys(errors).length === 0);
+  };
   const [fontsLoaded] = useFonts({
     "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
     "Inter-Bold": require("../assets/fonts/Inter-Bold.ttf"),
@@ -32,7 +59,13 @@ export default function SignupLogin2() {
     return undefined;
   }
 
+
+
+
+
   return (
+    <AlertNotificationRoot>
+
     <View style={styles.container}>
       <View style={styles.containerWelcome}>
         <Text style={[styles.welcome, { fontFamily: "Inter-Bold" }]}>
@@ -43,6 +76,8 @@ export default function SignupLogin2() {
         </Text>
       </View>
       <View style={styles.containerInput}>
+        <Text style={styles.error}>{errors.email}</Text>
+
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold", marginBottom: 50 }]}
           placeholder="abc@gmail.com"
@@ -50,6 +85,8 @@ export default function SignupLogin2() {
           value={email}
           onChangeText={(text) => setEmail(text)}
         />
+        <Text style={styles.error}>{errors.password}</Text>
+
         <TextInput
           style={[styles.input, { fontFamily: "Inter-Bold" }]}
           placeholder="Password"
@@ -63,13 +100,25 @@ export default function SignupLogin2() {
         <TouchableOpacity
           style={styles.buttonLogin}
           onPress={() => {
-            login(email, password);
+            validateForm();
+            if (isFormValid) {
+              login(email, password);
+            } else {
+              Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Login Fail',
+                textBody: 'Please check your email or password.',
+                button: 'close',
+              })
+            }
+
           }}
         >
           <Text style={[styles.buttonTextLogin, { fontFamily: "Inter-Bold" }]}>
             Login
           </Text>
         </TouchableOpacity>
+
       </View>
       <View style={styles.containerForgotPassword}>
         <TouchableOpacity
@@ -111,8 +160,12 @@ export default function SignupLogin2() {
             Sign up
           </Text>
         </View>
+        
       </View>
+
+       
     </View>
+      </AlertNotificationRoot>
   );
 }
 
@@ -239,5 +292,12 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: 700,
     letterSpacing: 2,
+  },
+
+  //error
+  error: {
+    color: 'red',
+    fontSize: 13,
+    fontWeight: "600"
   },
 });
