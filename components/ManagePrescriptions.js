@@ -86,7 +86,7 @@ export default function ManagePrescriptions() {
 
 
             <FlatList contentContainerStyle={styles.listPrescription} data={listPres}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
                 renderItem={({ item: data, index }) => (
                     <View style={styles.cardPrescription}>
                         <DotCard ></DotCard>
@@ -97,9 +97,7 @@ export default function ManagePrescriptions() {
                             <Text style={styles.context}>
                                 Trieu chung: {data.diagnosis}
                             </Text>
-                            <Text style={styles.context}>
-                                {/* {item.detailPres[1]} */}
-                            </Text >
+                           
 
                         </View>
                     </View>

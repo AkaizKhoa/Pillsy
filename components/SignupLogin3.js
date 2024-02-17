@@ -41,6 +41,8 @@ export default function SignupLogin3() {
     // Validate name field 
     if (!email) {
       errors.email = '*Email is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = 'Invalid email format.';
     }
 
     // Validate email field 

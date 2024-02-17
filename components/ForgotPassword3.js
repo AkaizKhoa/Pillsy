@@ -9,13 +9,119 @@ import {
   View,
   Platform
 } from "react-native";
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import VerifyIcon from "../assets/icon/forgotpassword_2_icon.svg";
 import { useNavigation } from "@react-navigation/native";
+import { AuthContext } from "../context/AuthContext";
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
-export default function ForgotPassword3() {
+import axios from "axios";
+import { BASE_URL } from "../config";
+
+export default function ForgotPassword3({route}) {
   const navigation = useNavigation();
+  const {email, token} = route.params
+  const [newPassword, setNewPassword] = useState(null);
+  const [confirmPassword, setComfirmPassword] = useState(null);
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [errors, setErrors] = useState({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  useEffect(() => {
+
+
+    validateForm();
+  }, [ newPassword, confirmPassword]);
+
+  const validateForm = () => {
+    let errors = {};
+
+
+    // Validate email field 
+    if (!newPassword) {
+      errors.newPassword = '*NewPassword is required.';
+    } else if (newPassword.length < 6) {
+      errors.newPassword = '*NewPassword must be at least 6 characters.';
+    }
+    
+    if (!confirmPassword) {
+      errors.confirmPassword = '*Confirm Password is required.';
+    }else if (confirmPassword !== newPassword) {
+      errors.confirmPassword = '*Confirm Password is not match';
+    }
+
+
+    // Set the errors and update form validity 
+    setErrors(errors);
+    setIsFormValid(Object.keys(errors).length === 0);
+  };
+
+
+
+  const createNewPassword = (newPassword, confirmPassword) => {
+    validateForm();
+
+    if (isFormValid) {
+      setIsLoading(true);
+      console.log('====================================');
+      console.log(newPassword, confirmPassword);
+      console.log('====================================');
+      axios
+        .post(`${BASE_URL}/api/v1/accounts/reset-password`, {
+          password: newPassword,
+          confirmPassword: confirmPassword,
+          email: email,
+          token: token
+
+        })
+        .then((res) => {
+          // const statusCode = res.status;
+          const responseData = res.data;
+          console.log("Response Data:", responseData);
+          console.log("Status" , res.status);
+          if (res.status === 200) {
+            Dialog.show({
+              type: ALERT_TYPE.SUCCESS,
+              title: 'Create new password is success!',
+              textBody: 'Password is ready to use. Go to Login',
+              button: 'close',
+              onPressButton: () => {
+                navigation.navigate('SignupLogin2'); // Thực hiện điều hướng sau khi đóng Dialog
+              },
+            })
+            setNewPassword(null);
+            setComfirmPassword(null);
+            console.log("Password changed successfully");
+          } else {
+            return
+          }
+        }
+        )
+        .catch((e) => {
+          console.log(`Create new password error ${e}`);
+          Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Create new password is fail!',
+            textBody: 'Something error , try again',
+            button: 'close',
+            
+          })
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+      // Form is valid, perform the submission logic 
+      console.log('Form submitted successfully!');
+    } else {
+
+      // Form is invalid, display error messages 
+      console.log('Form has errors. Please correct them.');
+    }
+  };
+
+
   return (
+    <AlertNotificationRoot>
     <SafeAreaView style={styles.screen}>
       <ScrollView style={styles.screen}>
         <KeyboardAvoidingView style={styles.screen} behavior="position">
@@ -31,6 +137,8 @@ export default function ForgotPassword3() {
                   placeholder="New Password"
                   placeholderTextColor={"#000000"}
                   style={styles.input}
+                  value={newPassword}
+                  onChangeText={(text) => setNewPassword(text)}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -38,6 +146,8 @@ export default function ForgotPassword3() {
                   placeholder="Confirm New Password"
                   placeholderTextColor={"#000000"}
                   style={styles.input}
+                  value={confirmPassword}
+                  onChangeText={(text) => setComfirmPassword(text)}
                 />
               </View>
 
@@ -45,16 +155,17 @@ export default function ForgotPassword3() {
               <TouchableOpacity
                 style={styles.buttonContainer}
                 onPress={() => {
-                  navigation.navigate("ForgotPassword3");
+                  createNewPassword(newPassword, confirmPassword)
                 }}
               >
-                <Text style={styles.buttonText}>Verify</Text>
+                <Text style={styles.buttonText}>Confirm</Text>
               </TouchableOpacity>
             </View>
           </View>
         </KeyboardAvoidingView>
       </ScrollView>
     </SafeAreaView>
+    </AlertNotificationRoot>
   );
 }
 
