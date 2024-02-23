@@ -70,8 +70,8 @@ export default function ForgotPassword1() {
             Dialog.show({
               type: ALERT_TYPE.SUCCESS,
               title: 'Success',
-              textBody: 'Check your Email tok get OTP.',
-              button: 'Close',
+              textBody: 'Check your Email to get OTP.',
+              button: 'Next',
               onPressButton: (() => {
               navigation.navigate("ForgotPassword2", {
               email: email,

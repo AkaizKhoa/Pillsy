@@ -63,7 +63,7 @@ export default function ForgotPassword2({ route }) {
             Dialog.show({
               type: ALERT_TYPE.SUCCESS,
               title: 'Success',
-              textBody: 'Check your Email tok get OTP.',
+              textBody: 'OTP is valid! Ready to create new password.',
               button: 'Next',
               onPressButton: (() => {
                 navigation.navigate("ForgotPassword3",

@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from "../config";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-
+import { format, parseISO  } from 'date-fns';
 
 export default function ManagePrescriptions() {
 
@@ -85,25 +85,51 @@ export default function ManagePrescriptions() {
             </View>
 
 
-            <FlatList contentContainerStyle={styles.listPrescription} data={listPres}
-            showsVerticalScrollIndicator={true}
-                renderItem={({ item: data, index }) => (
-                    <View style={styles.cardPrescription}>
-                        <DotCard ></DotCard>
-                        <View style={styles.groupText}>
-                            <Text style={styles.title}>
-                                Don thuoc
-                            </Text>
-                            <Text style={styles.context}>
-                                Trieu chung: {data.diagnosis}
-                            </Text>
-                           
+            <FlatList 
+    contentContainerStyle={styles.listPrescription} 
+    data={listPres}
+    showsVerticalScrollIndicator={true}
+    renderItem={({ item: data, index }) => (
+        <View style={styles.cardPrescription}>
+            <DotCard />
+            <View style={styles.groupText}>
+                <Text style={styles.title}>
+                    Đơn thuốc
+                </Text>
+                <View style={styles.groupCreatedDate}>
+                                <Text style={styles.contextTitle}>Ngày scan đơn thuốc: </Text>
+                                <Text>{data.createdDate ? format(parseISO(data.createdDate), 'dd-MM-yyyy'): 'N/A' }</Text>
+
+                            </View>
+                <View style={styles.context}>
+                    <Text style={styles.contextTitle}>Triệu chứng: </Text>
+                    <Text>{data.diagnosis}</Text>
+                </View>
+                <Text style={styles.contextPill}>
+                    Các viên thuốc:
+                </Text>
+                <FlatList 
+                    data={data.pills}
+                    renderItem={({ item }) => (
+                        <View style={styles.pillItem}>
+                            <Text style={styles.pillName}> ⚫ {item.pillName}</Text>
+                            <Text style={styles.pillQuantity}>{item.quantity} {item.unit}</Text>
+                            <View style={styles.pillTimeline}>
+                                <Text style={styles.HSD}>Thời hạn: </Text>
+                            <Text style={styles.pillDate}> {item.dateStart ? format(parseISO(item.dateStart), 'dd-MM-yyyy') : 'N/A'} - {item.dateEnd ? format(parseISO(item.dateEnd), 'dd-MM-yyyy') : 'N/A'}</Text>
+                            </View>
+                            
 
                         </View>
-                    </View>
-                )}
-                keyExtractor={(data, index) => index.toString()}
-            />
+                    )}
+                    keyExtractor={(item, index) => index.toString()}
+                />
+            </View>
+        </View>
+    )}
+    keyExtractor={(data, index) => index.toString()}
+/>
+
 
 
 
@@ -118,6 +144,8 @@ export default function ManagePrescriptions() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     arrowBackContainer: {
         width: 80,
@@ -140,7 +168,7 @@ const styles = StyleSheet.create({
     },
 
     containerSearch: {
-        width: "100%",
+        width: 400,
 
     },
 
@@ -166,8 +194,8 @@ const styles = StyleSheet.create({
     },
     listPrescription: {
         paddingHorizontal: 35,
-        marginTop: 15
-
+        marginTop: 15,
+        margin: 10,
     },
     cardPrescription: {
         width: "100%",
@@ -191,7 +219,24 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: "left",
         width: "100%",
+        flexDirection: "row"
 
+    },
+    contextTitle:{
+      fontWeight: "bold"  
+    },
+    contextPill:{
+        fontSize: 15,
+        textAlign: "left",
+        width: "100%",
+        fontWeight: "bold"
+    },
+    pillTimeline:{
+        flexDirection: "row"
+    },
+    HSD:{
+        fontWeight: "bold",
+        color: "red"
     },
     groupText: {
         flexDirection: "column",
@@ -199,4 +244,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
 
     },
+    groupCreatedDate:{
+        flexDirection: "row",
+        flexWrap: "wrap"
+
+    }
 }) 

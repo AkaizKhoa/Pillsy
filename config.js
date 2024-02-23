@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://pillsy.azurewebsites.net'
+export const BASE_URL = 'https://pillsydb.azurewebsites.net'

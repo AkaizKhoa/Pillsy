@@ -113,7 +113,13 @@ export default function ForgotPassword3({route}) {
       // Form is valid, perform the submission logic 
       console.log('Form submitted successfully!');
     } else {
-
+      Dialog.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Create new password is fail!',
+        textBody: 'Please fill your newpassword !!',
+        button: 'close',
+        
+      })
       // Form is invalid, display error messages 
       console.log('Form has errors. Please correct them.');
     }
@@ -132,6 +138,9 @@ export default function ForgotPassword3({route}) {
               <Text style={styles.forgotDescriptionText}>
                 Please type the new password and confirm new password
               </Text>
+              <View style={{width: "80%", justifyContent: "flex-start"}}>
+              <Text style={styles.error}>{errors.newPassword}</Text>
+              </View>
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="New Password"
@@ -140,6 +149,9 @@ export default function ForgotPassword3({route}) {
                   value={newPassword}
                   onChangeText={(text) => setNewPassword(text)}
                 />
+              </View>
+              <View style={{width: "80%", justifyContent: "flex-start"}}>
+              <Text style={styles.error}>{errors.confirmPassword}</Text>
               </View>
               <View style={styles.inputContainer}>
                 <TextInput
@@ -224,5 +236,11 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  error: {
+    color: 'red',
+    fontSize: 13,
+    fontWeight: "600",
+    paddingTop: 10
   },
 });

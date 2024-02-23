@@ -104,7 +104,7 @@ export default function MainScreen() {
                                 style={styles.button}
                                 onPress={() => {
 
-                                    navigation.navigate("ReminderScheduling")
+                                    navigation.navigate("ReminderNotifications")
 
 
                                 }}
@@ -169,7 +169,7 @@ export default function MainScreen() {
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    // Handle login button press
+                                    navigation.navigate("PaymentPackage")
                                 }}
                             >
                                 <View style={styles.iconFeature}>

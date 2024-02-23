@@ -19,6 +19,8 @@ import InputInformation1 from "../../components/InputInformation1";
 import ForgotPassword1 from "../../components/ForgotPassword1";
 import ForgotPassword2 from "../../components/ForgotPassword2";
 import ForgotPassword3 from "../../components/ForgotPassword3";
+import ReminderNotifications from "../../components/ReminderNotifications";
+import PaymentPackage from "../../components/PaymentPackage";
 
 const HomeNavigator = () => {
   const HomeStack = createNativeStackNavigator();
@@ -72,8 +74,12 @@ const HomeNavigator = () => {
           component={CustomerFeedBack1}
         ></HomeStack.Screen>
         <HomeStack.Screen
-          name="ReminderScheduling"
-          component={ReminderScheduling}
+          name="ReminderNotifications"
+          component={ReminderNotifications}
+        ></HomeStack.Screen>
+         <HomeStack.Screen
+          name="PaymentPackage"
+          component={PaymentPackage}
         ></HomeStack.Screen>
         <HomeStack.Screen
           name="ProfileUserDetail"

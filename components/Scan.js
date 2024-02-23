@@ -18,7 +18,7 @@ import axios from 'axios';
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import LoadingIndicator from '../context/LoadingIndicator ';
-
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 export default function Scan() {
 
@@ -30,8 +30,9 @@ export default function Scan() {
   const [isLoading, setIsLoading] = useState(false)
   const { userToken } = useContext(AuthContext);
 
-  const [imageBase64, setImageBase64] = useState(null);
+  const [image, setImage] = useState(null);
   const [data, setData] = useState(null);
+
 
   const navigation = useNavigation();
   const uploadImageEndpoint = `${BASE_URL}/api/v1/prescription-management/prescriptions/upload-ocr-image`;
@@ -42,9 +43,9 @@ export default function Scan() {
         allowsEditing: true,
         quality: 1,
       });
-      console.log('====================================');
-      console.log("Result: ", result.assets[0].uri);
-      console.log('====================================');
+      // console.log('====================================');
+      // console.log("Result: ", result.assets[0].uri);
+      // console.log('====================================');
       if (!result.canceled) {
         setIsLoading(true);
 
@@ -66,9 +67,9 @@ export default function Scan() {
         const uriQueryParam = `?uri=${encodeURIComponent(result.assets[0].uri)}`;
         const uploadImageURL = `${uploadImageEndpoint}${uriQueryParam}`;
 
-        console.log('====================================');
-        console.log(uploadImageURL);
-        console.log('====================================');
+        // console.log('====================================');
+        // console.log(uploadImageURL);
+        // console.log('====================================');
         console.log('====================================');
         console.log(formData);
         console.log('====================================');
@@ -77,9 +78,11 @@ export default function Scan() {
         axios.post(uploadImageURL, formData, { headers })
           .then((response) => {
             // Handle the response from the API
+            console.log(">>>>>Res:", response);
             console.log('API Response:', response.data);
-            setImageBase64(response.data.imageBase64);
+            setImage(response.data.image);
             setData(response.data)
+            console.log("Data:" , data);
             // Add any additional logic based on the API response
           })
           .catch((error) => {
@@ -103,7 +106,7 @@ export default function Scan() {
       user_Id: data.user_Id,
       prescription_Id: data.prescription_Id,
       data: data.data,
-      imageBase64: imageBase64,  // Use the imageBase64 from state
+      image: image,  // Use the image from state
       error: data.error
     };
   
@@ -115,12 +118,25 @@ export default function Scan() {
     axios.post(secondApiEndpoint, requestData, { headers })
       .then((secondApiResponse) => {
         // Handle the response from the second API
+        console.log("Data cần set vào remind: ", secondApiResponse.data.Data.medication_records);
+      
+        Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Scan is done! You can ready to use reminder.',
+          button: 'Auto Remind',
+          onPressButton: (() => {
+            navigation.navigate("ReminderNotifications", {
+              remindData: secondApiResponse.data.Data.medication_records
+            })
+          })
+        })
         console.log('Second API Response:', secondApiResponse.data);
-        setImageBase64(null);
+        setImage(null);
       })
       .catch((error) => {
         console.error('Second API Error:', error.response || error);
-        setImageBase64(null);
+        setImage(null);
 
         // Handle errors if needed
       });
@@ -139,14 +155,14 @@ export default function Scan() {
 
   useEffect(() => {
     // Assume 'response' is the API response
-    if (imageBase64) {
-      setImageBase64(imageBase64);
+    if (image) {
+      setImage(image);
     }
 
     console.log('====================================');
-    console.log(imageBase64);
+    console.log(image);
     console.log('====================================');
-  }, [imageBase64]);
+  }, [image]);
 
 
   if (hasCameraPermission === undefined) {
@@ -220,13 +236,14 @@ export default function Scan() {
   }
 
   return (
+    <AlertNotificationRoot>
     <View style={styles.container}>
       
-      {imageBase64 &&  (
+      {image &&  (
       <View style={styles.overlayBackground}>
         <View style={styles.containerPopUp}>
         <View style={styles.confirmContainer}>
-        <Image source={{ uri: `data:image/jpg;base64,` + imageBase64 }} style={styles.confirmImage} />
+        <Image source={{ uri: `data:image/jpg;base64,` + image }} style={styles.confirmImage} />
         <TouchableOpacity
           style={styles.confirmButton}
           onPress={() => {
@@ -297,6 +314,7 @@ export default function Scan() {
         <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />
       )}
     </View>
+    </AlertNotificationRoot>
   );
 }
 

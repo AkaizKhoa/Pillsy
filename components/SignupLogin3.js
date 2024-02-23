@@ -16,6 +16,7 @@ import FaceBookIcon from "../assets/icon/facebook_icon.svg";
 import AppleIcon from "../assets/icon/apple_icon.svg";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 import { useNavigation } from '@react-navigation/native';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 export default function SignupLogin3() {
 
@@ -72,7 +73,13 @@ const handleSubmit = () =>  {
       password: password
     })
   }else{
-    return
+    Dialog.show({
+      type: ALERT_TYPE.DANGER,
+      title: 'Sigup fail!!',
+      textBody: 'Please complete all information.',
+      button: 'close',
+      
+    })
   }
 }
   
@@ -84,6 +91,7 @@ const handleSubmit = () =>  {
     return undefined;
   }
   return (
+    <AlertNotificationRoot>
     <View style={styles.container}>
       <View style={styles.arrowBackContainer}>
         <Pressable style={({ pressed }) => pressed && styles.pressedItem}
@@ -187,6 +195,7 @@ const handleSubmit = () =>  {
         </View>
       </View>
     </View>
+    </AlertNotificationRoot>
   );
 }
 

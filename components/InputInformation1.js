@@ -9,7 +9,8 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Modal,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from "react-native";
 import { useFonts } from "expo-font";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
@@ -179,11 +180,28 @@ const { email, password } = route.params;
     setOpenDate(!openDate)
  
   }
-function handleChangeDate(propDate){
-  const formattedDate = moment(propDate, 'YYYY/MM/DD').format('DD/MM/YYYY');
-  console.log(formattedDate);
-  setDateOfBirth(formattedDate);
-}
+  function handleChangeDate(propDate) {
+    const selectedDate = moment(propDate, 'YYYY/MM/DD');
+    const currentDate = moment();
+    
+    // Kiểm tra xem ngày sinh được chọn có lớn hơn ngày hiện tại không
+    if (selectedDate.isAfter(currentDate)) {
+      // Nếu có, hiển thị thông báo lỗi và không cho phép ghi nhận ngày đó
+      Alert.alert(
+        'Error',
+        'Please select a valid date of birth.',
+        [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+        { cancelable: false }
+      );
+    } else {
+      // Nếu không, ghi nhận ngày sinh
+      const formattedDate = selectedDate.format('DD/MM/YYYY');
+      console.log(formattedDate);
+      setDateOfBirth(formattedDate);
+      setOpenDate(false); // Đóng modal ngày sinh sau khi chọn
+    }
+  }
+  
 
 
 
@@ -285,14 +303,16 @@ function handleChangeDate(propDate){
                   }}
                 />
               </View>
-              <View style={styles.emailInputContainer}>
+              <View style={styles.dateOfBirthInputContainer}>
                 <Text style={styles.labelInput}>Date Of Birth</Text>
                 <Text style={styles.error}>{errors.dateOfBirth}</Text>
 
+                <View style={styles.selectedDob}>
                 <Pressable onPress={handleOnPress}>
-                  <Text>Selected your date of birth</Text>
+                  <Text style={styles.selectedDateText}>Selected your date of birth</Text>
                 </Pressable>
-                <Text>{dateOfBirth}</Text>
+                </View>
+                <Text style={styles.resultDOB}>{dateOfBirth}</Text>
                 <Modal animationType="slide"
                   transparent={true}
                   visible={openDate}>
@@ -421,6 +441,25 @@ const styles = StyleSheet.create({
   phoneNumberInputContainer: {
     flexDirection: "column",
     borderColor: "#000",
+  },
+
+  dateOfBirthInputContainer:{
+    marginTop: 10,
+  },
+  selectedDob:{
+    backgroundColor: "#F3F3F3",
+    width: 300,
+    height: 50,
+    paddingLeft: 10,
+    flexDirection: "column",
+    justifyContent: "center",
+    borderRadius: 10
+  },
+  selectedDateText:{
+    color: "#000"
+  },
+  resultDOB:{
+    
   },
   labelInput: {
     color: "#575757",
