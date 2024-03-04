@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { BASE_URL } from "../config";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { format, parseISO  } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 export default function ManagePrescriptions() {
 
@@ -22,119 +22,122 @@ export default function ManagePrescriptions() {
     const { userToken } = useContext(AuthContext);
 
 
-  
+
     useEffect(() => {
         const abortController = new AbortController();
         const url = `${BASE_URL}/api/v1/prescription-management/prescriptions/patient/${userInfo.PatientId}/all-prescription`;
-    
-        const fetchData = async () => {
-          try {
-            setIsLoading(true)
-            const response = await axios.get(url, { signal: abortController.signal, headers: {
-                'Authorization': 'Bearer ' + userToken
-              } });
-            console.log(response.data);
-            const listPres = response.data
-            setListPres(listPres)
-          } catch (error) {
-            if(abortController.signal.aborted){
-              console.log('Data fetching cancelled');
-            }else{
-             // Handle error
-            }
-          }finally{
-            setIsLoading(false)
 
-          }
+        const fetchData = async () => {
+            try {
+                setIsLoading(true)
+                const response = await axios.get(url, {
+                    signal: abortController.signal, headers: {
+                        'Authorization': 'Bearer ' + userToken
+                    }
+                });
+                console.log(response.data);
+                const listPres = response.data
+                setListPres(listPres)
+            } catch (error) {
+                if (abortController.signal.aborted) {
+                    console.log('Data fetching cancelled');
+                } else {
+                    // Handle error
+                }
+            } finally {
+                setIsLoading(false)
+
+            }
         };
-    
+
         fetchData();
-    
+
         return () => abortController.abort("Data fetching cancelled");
-      }, []);
-      
+    }, []);
+
 
     return (
         <View style={styles.container}>
-           {isLoading ? (
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center", gap: 20}}>
-                <Image source={require("../assets/loading/prescription.gif")} />
-                <Text style={{fontSize: 20, fontWeight: "600"}}>Loading....</Text>
-            </View>
-           ): (
-            <View>
-                 <View style={styles.arrowBackContainer}>
-                <Pressable style={({ pressed }) => pressed && styles.pressedItem}
-                    onPress={() => {
-                        navigation.navigate("MainScreen")
-
-                    }}>
-                    <ArrowBackLeft />
-                </Pressable>
-            </View>
-
-            <View style={styles.containerTitle}>
-                <Text style={styles.upperTitle}>Manage Prescriptions</Text>
-            </View>
-            <View style={styles.containerSearch}>
-                <View style={styles.groupSeacrh}>
-                    <IconSearch style={styles.searchIcon} />
-                    <TextInput style={styles.inputSearch} value={prescription} onChangeText={setPrescription}   >
-                    </TextInput>
+            {isLoading ? (
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20 }}>
+                    <Image source={require("../assets/loading/prescription.gif")} />
+                    <Text style={{ fontSize: 20, fontWeight: "600" }}>Loading....</Text>
                 </View>
-            </View>
+            ) : (
+                <View>
+                    <View style={styles.arrowBackContainer}>
+                        <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+                            onPress={() => {
+                                navigation.navigate("MainScreen")
 
+                            }}>
+                            <ArrowBackLeft />
+                        </Pressable>
+                    </View>
 
-            <FlatList 
-    contentContainerStyle={styles.listPrescription} 
-    data={listPres}
-    showsVerticalScrollIndicator={true}
-    renderItem={({ item: data, index }) => (
-        <View style={styles.cardPrescription}>
-            <DotCard />
-            <View style={styles.groupText}>
-                <Text style={styles.title}>
-                    Đơn thuốc
-                </Text>
-                <View style={styles.groupCreatedDate}>
-                                <Text style={styles.contextTitle}>Ngày scan đơn thuốc: </Text>
-                                <Text>{data.createdDate ? format(parseISO(data.createdDate), 'dd-MM-yyyy'): 'N/A' }</Text>
-
-                            </View>
-                <View style={styles.context}>
-                    <Text style={styles.contextTitle}>Triệu chứng: </Text>
-                    <Text>{data.diagnosis}</Text>
-                </View>
-                <Text style={styles.contextPill}>
-                    Các viên thuốc:
-                </Text>
-                <FlatList 
-                    data={data.pills}
-                    renderItem={({ item }) => (
-                        <View style={styles.pillItem}>
-                            <Text style={styles.pillName}> ⚫ {item.pillName}</Text>
-                            <Text style={styles.pillQuantity}>{item.quantity} {item.unit}</Text>
-                            <View style={styles.pillTimeline}>
-                                <Text style={styles.HSD}>Thời hạn: </Text>
-                            <Text style={styles.pillDate}> {item.dateStart ? format(parseISO(item.dateStart), 'dd-MM-yyyy') : 'N/A'} - {item.dateEnd ? format(parseISO(item.dateEnd), 'dd-MM-yyyy') : 'N/A'}</Text>
-                            </View>
-                            
-
+                    <View style={styles.containerTitle}>
+                        <Text style={styles.upperTitle}>Manage Prescriptions</Text>
+                    </View>
+                    <View style={styles.containerSearch}>
+                        <View style={styles.groupSeacrh}>
+                            <IconSearch style={styles.searchIcon} />
+                            <TextInput style={styles.inputSearch} value={prescription} onChangeText={setPrescription}   >
+                            </TextInput>
                         </View>
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            </View>
-        </View>
-    )}
-    keyExtractor={(data, index) => index.toString()}
-/>
+                    </View>
+
+
+                    <FlatList
+                        contentContainerStyle={styles.listPrescription}
+                        data={listPres}
+                        showsVerticalScrollIndicator={true}
+                        renderItem={({ item: data, index }) => (
+                            <View style={styles.cardPrescription}>
+                                <DotCard />
+                                <View style={styles.groupText}>
+                                    <Text style={styles.title}>
+                                        Đơn thuốc
+                                    </Text>
+                                    <View style={styles.groupCreatedDate}>
+                                        <Text style={styles.contextTitle}>Ngày scan đơn thuốc: </Text>
+                                        <Text>{data.createdDate ? format(parseISO(data.createdDate), 'dd-MM-yyyy') : 'N/A'}</Text>
+
+                                    </View>
+                                    <View style={styles.context}>
+                                        <Text style={styles.contextTitle}>Triệu chứng: </Text>
+                                        <Text>{data.diagnosis}</Text>
+                                    </View>
+                                    <Text style={styles.contextPill}>
+                                        Các viên thuốc:
+                                    </Text>
+                                    <FlatList
+                                        data={data.pills}
+                                        renderItem={({ item }) => (
+                                            <View style={styles.pillItem}>
+                                                <Text style={styles.pillName}> ⚫ {item.pillName}</Text>
+                                                <Text style={styles.pillQuantity}>{item.quantity} {item.unit}</Text>
+                                                <Text style={styles.pillDosage}>{item.dosage_per_day}/Ngày</Text>
+                                                <View style={styles.pillTimeline}>
+                                                    <Text style={styles.HSD}>Thời hạn: </Text>
+                                                    <Text style={styles.pillDate}> {item.dateStart ? format(parseISO(item.dateStart), 'dd-MM-yyyy') : 'N/A'} - {item.dateEnd ? format(parseISO(item.dateEnd), 'dd-MM-yyyy') : 'N/A'}</Text>
+                                                </View>
+
+
+                                            </View>
+                                        )}
+                                        keyExtractor={(item, index) => index.toString()}
+                                    />
+                                </View>
+                            </View>
+                        )}
+                        keyExtractor={(data, index) => index.toString()}
+                    />
 
 
 
 
-            </View>
-           )}
+                </View>
+            )}
 
 
         </View>
@@ -222,19 +225,19 @@ const styles = StyleSheet.create({
         flexDirection: "row"
 
     },
-    contextTitle:{
-      fontWeight: "bold"  
+    contextTitle: {
+        fontWeight: "bold"
     },
-    contextPill:{
+    contextPill: {
         fontSize: 15,
         textAlign: "left",
         width: "100%",
         fontWeight: "bold"
     },
-    pillTimeline:{
+    pillTimeline: {
         flexDirection: "row"
     },
-    HSD:{
+    HSD: {
         fontWeight: "bold",
         color: "red"
     },
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
 
     },
-    groupCreatedDate:{
+    groupCreatedDate: {
         flexDirection: "row",
         flexWrap: "wrap"
 

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, Button, Platform, Alert, TextInput, FlatList,
-   SafeAreaView, TouchableOpacity, Keyboard, StyleSheet, Pressable, Image } from 'react-native';
+import React, { useState, useEffect, useMemo, useFocusEffect } from 'react';
+import {
+  Text, View, Button, Platform, Alert, TextInput, FlatList,
+  SafeAreaView, TouchableOpacity, Keyboard, StyleSheet, Pressable, Image
+} from 'react-native';
 import * as Notifications from 'expo-notifications';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,18 +11,27 @@ import { useNavigation } from '@react-navigation/native';
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 
 
-export default function ReminderNotifications({route}) {
+export default function ReminderNotifications({ route }) {
   const navigation = useNavigation();
   const [isDateTimePickerVisible, setDateTimePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState('');
+  const [isNoteFilled, setIsNoteFilled] = useState(false);
+
+
   const [reminders, setReminders] = useState([]);
 
-  const { remindData } = route.params || {}; 
+  const memoizedRemindData = useMemo(() => remindData, []);
+  
+  const { remindData } = route.params || []; 
+
+ 
+
+
 
   useEffect(() => {
+
     // Khởi động dữ liệu từ AsyncStorage khi component mount
-    loadReminders();
     registerForPushNotificationsAsync();
     const notificationHandler = {
       handleNotification: async () => ({
@@ -30,34 +41,65 @@ export default function ReminderNotifications({route}) {
       }),
     };
     Notifications.setNotificationHandler(notificationHandler);
-
-    // Lưu trữ dữ liệu vào AsyncStorage khi component unmount
-    return () => {
-      saveReminders(reminders);
-    };
+ 
+    loadReminders()
   }, []);
 
+  useEffect(() => {
+    setIsNoteFilled(!!note.trim());
+  }, [note]);
 
   useEffect(() => {
-    // Nếu remindData có dữ liệu
-    if (remindData) {
-      // Duyệt qua mỗi phần tử trong remindData để tạo nhắc nhở và lưu vào state và AsyncStorage
+    if (remindData && Array.isArray(remindData)) {
       remindData.forEach(item => {
-        const date = new Date(item.date);
-        handleAddReminder(date, item.name); // Gọi hàm handleAddReminder để thêm nhắc nhở
-        scheduleNotificationAsync(date, item.name); // Gọi hàm scheduleNotificationAsync để đặt lịch nhắc nhở
+        const startDate = new Date(item.start_date);
+        const endDate = new Date(item.end_date);
+
+        // Lặp qua từng ngày từ startDate đến endDate
+        for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+          // Kiểm tra xem ngày hiện tại có nằm trong khoảng từ start_date đến end_date không
+          if (date) {
+            // Kiểm tra các frequency để set thời gian cho reminder
+            if (item.frequency_morning === 1) {
+              const morningDate = new Date(date);
+              morningDate.setHours(4, 6, 0, 0);
+              handleAddReminder(morningDate, item.name);
+              scheduleNotificationAsync(morningDate, item.name);
+
+            }
+            if (item.frequency_afternoon === 1) {
+              const afternoonDate = new Date(date);
+              afternoonDate.setHours(13, 0, 0, 0);
+              handleAddReminder(afternoonDate, item.name);
+              scheduleNotificationAsync(afternoonDate, item.name);
+
+            }
+            if (item.frequency_evening === 1) {
+              const eveningDate = new Date(date);
+              eveningDate.setHours(18, 0, 0, 0);
+              handleAddReminder(eveningDate, item.name);
+              scheduleNotificationAsync(eveningDate, item.name);
+
+
+            }
+          }
+        }
       });
+
+
+    } else {
+
+      return
     }
-  }, [remindData]);
+
+  }, [memoizedRemindData]);
 
   const loadReminders = async () => {
     try {
       const remindersData = await AsyncStorage.getItem('reminders');
       if (remindersData !== null) {
         setReminders(JSON.parse(remindersData));
-        console.log('====================================');
-        console.log("load: ", remindersData);
-        console.log('====================================');
+      
       }
     } catch (error) {
       console.error('Failed to load reminders:', error);
@@ -74,10 +116,6 @@ export default function ReminderNotifications({route}) {
 
 
 
-  const handleNotification = notification => {
-    console.log(notification);
-  };
-
   const showDateTimePicker = () => {
     setDateTimePickerVisible(true);
   };
@@ -91,7 +129,7 @@ export default function ReminderNotifications({route}) {
     newDate.setSeconds(0);
 
     setSelectedDate(newDate);
-    handleAddReminder(newDate);
+    handleAddReminderNote(newDate);
     hideDateTimePicker();
   };
 
@@ -105,10 +143,10 @@ export default function ReminderNotifications({route}) {
         },
         trigger: { date },
       });
-      Alert.alert('Notification scheduled successfully!');
+      // Alert.alert('Notification scheduled successfully!');
     } catch (error) {
       console.error('Failed to schedule notification:', error);
-      Alert.alert('Failed to schedule notification. Please try again later.');
+      // Alert.alert('Failed to schedule notification. Please try again later.');
     }
   };
 
@@ -137,8 +175,21 @@ export default function ReminderNotifications({route}) {
   };
 
 
-  const handleAddReminder = (date) => {
+  const handleAddReminder = (date, name) => {
+    const newReminder = { date: date, note: name };
+
+    setReminders(prevReminders => {
+      const updatedReminders = [...prevReminders, newReminder];
+      saveReminders(updatedReminders);
+      return updatedReminders;
+    });
+    setNote('');
+  };
+  
+
+  const handleAddReminderNote = (date) => {
     const newReminder = { date: date, note: note };
+
     setReminders(prevReminders => {
       const updatedReminders = [...prevReminders, newReminder];
       saveReminders(updatedReminders);
@@ -147,111 +198,208 @@ export default function ReminderNotifications({route}) {
     setNote('');
   };
 
-  const handleDeleteReminder = async (index) => {
+  const handleDeleteReminder = async (accId, time, index) => {
     try {
+      console.log('====================================');
+      console.log("data click vào ngày: ", format(accId.date, 'dd-MM-yyyy HH:mm'), index);
+      console.log("data click vào time: ", format(accId.date, 'HH:mm'), index);
+      console.log("data click vào tên: ", accId.note, index);
+      console.log('====================================');
+
       const updatedReminders = [...reminders];
-      const deletedReminder = updatedReminders.splice(index, 1)[0]; // Lấy ra mục muốn xóa
-      setReminders(updatedReminders); // Cập nhật state reminders
 
-      // Lấy danh sách reminders từ AsyncStorage
-      const remindersData = await AsyncStorage.getItem('reminders');
-      let remindersList = remindersData ? JSON.parse(remindersData) : [];
+      const indexToDelete = updatedReminders.findIndex(reminder => {
+        return (
+          format(accId.date, 'dd-MM-yyyy') === format(reminder.date, 'dd-MM-yyyy') &&
+          format(accId.date, 'HH:mm') === format(reminder.date, 'HH:mm') &&
+          accId.note === reminder.note
+        );
+      });
 
-      // Lọc ra mục cần xóa và cập nhật lại danh sách reminders trước khi lưu vào AsyncStorage
-      remindersList = remindersList.filter(item => item.date !== deletedReminder.date || item.note !== deletedReminder.note);
-      await AsyncStorage.setItem('reminders', JSON.stringify(remindersList));
+      if (indexToDelete !== -1) {
+        updatedReminders.splice(indexToDelete, 1);
+        setReminders(updatedReminders);
 
-      Alert.alert('Reminder deleted successfully!');
+        const remindersData = await AsyncStorage.getItem('reminders');
+        let remindersList = remindersData ? JSON.parse(remindersData) : [];
+
+        remindersList = remindersList.filter(item => (
+          format(accId.date, 'dd-MM-yyyy') !== format(item.date, 'dd-MM-yyyy') ||
+          format(accId.date, 'HH:mm') !== format(item.date, 'HH:mm') ||
+          accId.note !== item.note
+        ));
+
+        await AsyncStorage.setItem('reminders', JSON.stringify(remindersList));
+      } else {
+        console.log('Selected reminder does not match any reminder in the list.');
+      }
+
+      setReminders([...updatedReminders]);
     } catch (error) {
       console.error('Failed to delete reminder from AsyncStorage:', error);
     }
   };
 
 
+
+  const handleClearAllReminders = async () => {
+    try {
+      // Xóa tất cả các lời nhắc khỏi state
+      setReminders([]);
+
+      // Xóa tất cả các lời nhắc đã lên lịch thông báo từ hệ thống thông báo
+      await Notifications.cancelAllScheduledNotificationsAsync();
+
+      // Xóa tất cả các lời nhắc đã lưu trong AsyncStorage
+      await AsyncStorage.removeItem('reminders');
+
+      
+      Alert.alert('All reminders cleared successfully!');
+    } catch (error) {
+      console.error('Failed to clear all reminders:', error);
+      Alert.alert('Failed to clear all reminders. Please try again later.');
+    }
+  };
+
+  const groupRemindersByDate = () => {
+    const groupedReminders = reminders.reduce((acc, reminder) => {
+      const date = format(reminder.date, 'dd-MM-yyyy HH:mm');
+      const time = format(reminder.date, 'HH:mm');
+      const dateTime = `${date} ${time}`; 
+
+      if (!acc[dateTime]) {
+        acc[dateTime] = [];
+      }
+      acc[dateTime].push(reminder);
+      return acc;
+    }, {});
+
+    console.log("reminders: ", reminders);
+
+    return Object.entries(groupedReminders).map(([dateTime, reminders]) => {
+      const [date, time] = dateTime.split(' '); 
+      return {
+        date,
+        time,
+        reminders,
+      };
+    });
+  };
+
   return (
     <SafeAreaView >
-    <View style={{marginTop: 50}}>
-    <View style={styles.arrowBackContainer}>
-        <Pressable style={({ pressed }) => pressed && styles.pressedItem}
-          onPress={() => {
-            navigation.navigate("MainScreen")
+      <View style={{ marginTop: 50 }}>
+        <View style={styles.arrowBackContainer}>
+          <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+            onPress={() => {
+              navigation.navigate("MainScreen")
 
-          }}>
-          <ArrowBackLeft />
-        </Pressable>
-      </View>
-      <View style={styles.containerTitle}>
-        <Text style={styles.upperTitle} >Reminders and Scheduling</Text>
-      </View>
-      <View style={styles.containerContext}>
-        <Text style={styles.upperContext} >Type your prescription to remind</Text>
-      </View>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <TextInput
-          style={{height: 40,
-            width: "90%",
-            borderColor: 'gray',
-            borderWidth: 1,
-            marginTop: 10,
-            padding: 10, // Tăng khoảng cách từ nội dung đến viền
-            borderRadius: 10, // Bo tròn viền
-            fontSize: 16,
-          marginBottom: 20 }}
-          onChangeText={text => setNote(text)}
-          value={note}
-          placeholder="Enter a note"
-        />
-      <View style={{flexDirection: "column-reverse", alignItems: 'center'}}>
-      <TouchableOpacity
-        onPress={showDateTimePicker}>
-         <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'center', width: 200, height: 40, backgroundColor: "#CDFADB", borderRadius: 10, }}>
-         <Text style={{fontWeight: "700"}}>Set up your remind! </Text>
+            }}>
+            <ArrowBackLeft />
+          </Pressable>
+        </View>
+        <View style={styles.containerTitle}>
+          <Text style={styles.upperTitle} >Reminders and Scheduling</Text>
+         <View >
+         <Image source={require('../assets/icon/icons8-notification.gif')} style={{ width: 30, height: 30,}} />
          </View>
-        </TouchableOpacity>
-        <Image source={require('../assets/icon/icons8-notification.gif')} style={{marginBottom: 10}} />
-      </View>
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          style={{ height: "100%" }}
-          data={reminders}
-          renderItem={({ item, index }) => (
-            <View style={{ flexDirection: 'column', backgroundColor: "#EE99C2", width: 300, height: 100, borderRadius: 20, padding: 10, marginVertical: 10,   }}>
-              <Text>{`Time: ${format(item.date, 'dd-MM-yyyy HH:mm')}`}</Text>
-              <Text>{`Note: ${item.note}`}</Text>
-              <View style={{flexDirection:"row", justifyContent: "flex-end"}}>
-              <TouchableOpacity onPress={() => handleDeleteReminder(index)} style={{ width: 60, height: 40, backgroundColor: "#000", justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
-                <Text style={{ color: '#fff' }}>Delete</Text>
-              </TouchableOpacity>
+        </View>
+        <View style={styles.containerContext}>
+          <Text style={styles.upperContext} >Type your prescription to remind</Text>
+        </View>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <TextInput
+            style={{
+              height: 40,
+              width: "90%",
+              borderColor: 'gray',
+              borderWidth: 1,
+              marginTop: 10,
+              padding: 10,
+              borderRadius: 10, 
+              fontSize: 16,
+              marginBottom: 20
+            }}
+            onChangeText={text => setNote(text)}
+            value={note}
+            placeholder="Enter a note"
+          />
+          <View style={{ flexDirection: "column-reverse", alignItems: 'center' }}>
+            
+            <TouchableOpacity
+              onPress={() => {
+                if (isNoteFilled) {
+                  setIsNoteFilled(true);
+                  setNote(note); 
+                  showDateTimePicker(); 
+                }
+              }}>
+              <View style={{ flexDirection: "row", alignItems: 'center', justifyContent: 'center', width: 200, height: 40, backgroundColor: "#CDFADB", borderRadius: 10, }}>
+                <Text style={{ fontWeight: "700" }}>Set up your remind! </Text>
               </View>
+            </TouchableOpacity>
+          
+          </View>
+
+          <TouchableOpacity style={{ marginTop: 10 }} onPress={handleClearAllReminders}  >
+
+            <View style={{ alignItems: 'center', width: 200., paddingVertical: 10, backgroundColor: "#F6995C", borderRadius: 10, }}>
+              <Text style={{ width: "100%", textAlign: 'center', height: "auto", flexDirection: "column" }}>Clear All</Text>
             </View>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          keyboardShouldPersistTaps="handled" // Đảm bảo việc chạm vào FlatList sẽ ẩn bàn phím
-        />
+          </TouchableOpacity>
 
-        <DateTimePickerModal
-          isVisible={isDateTimePickerVisible}
-          mode="datetime"
-          onConfirm={date => {
-            const newDate = new Date(date);
-            newDate.setSeconds(0);
-            handleDatePicked(newDate);
-            scheduleNotificationAsync(newDate, note);
-            Keyboard.dismiss(); // Ẩn bàn phím
-          }}
-          onCancel={() => {
-            hideDateTimePicker();
-            Keyboard.dismiss(); // Ẩn bàn phím
-          }}
-          onHide={() => Keyboard.dismiss()} // Ẩn bàn phím khi DateTimePickerModal bị ẩn
-          display={Platform.OS === "ios" ? "calendar" : "default"}
-          modalStyleIOS={{}}
-          pickerStyleIOS={{ alignItems: 'center', paddingVertical: 20 }}
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{}}
+            data={groupRemindersByDate()}
+            renderItem={({ item }) => (
+              <View style={{ marginBottom: 20 }}>
+           <View style={{flexDirection: "row", width: "auto", }}>
+           <Text style={{ fontSize: 20, fontWeight: 'bold', paddingRight: 10 }}>{item.date}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.time}</Text>
+           </View>
+                {item.reminders.map((reminder, index) => (
+                  <View key={index} style={{ flexDirection: 'column', backgroundColor: "#EE99C2", width: 300, borderRadius: 20, padding: 10, marginTop: 10 }}>
+                  
+                    <Text>{`Note: ${reminder.note}`}</Text>
+                    <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                      <TouchableOpacity onPress={() => handleDeleteReminder(reminder, item.time, index)} style={{ width: 60, height: 40, backgroundColor: "#000", justifyContent: 'center', alignItems: 'center', borderRadius: 10 }}>
+                        <Text style={{ color: '#fff' }}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            keyboardShouldPersistTaps="handled"
+          />
 
-        />
+
+          <DateTimePickerModal
+            isVisible={isDateTimePickerVisible}
+            mode="datetime"
+            onConfirm={date => {
+              const newDate = new Date(date);
+              newDate.setSeconds(0);
+              handleDatePicked(newDate);
+              scheduleNotificationAsync(newDate, note);
+              Keyboard.dismiss(); // Ẩn bàn phím
+            }}
+            onCancel={() => {
+              hideDateTimePicker();
+              Keyboard.dismiss(); // Ẩn bàn phím
+            }}
+            onHide={() => Keyboard.dismiss()} // Ẩn bàn phím khi DateTimePickerModal bị ẩn
+            display={Platform.OS === "ios" ? "calendar" : "default"}
+            modalStyleIOS={{}}
+            pickerStyleIOS={{ alignItems: 'center', paddingVertical: 20 }}
+
+          />
+
+        </View>
 
       </View>
-    </View>
     </SafeAreaView>
   );
 }
@@ -269,6 +417,7 @@ const styles = StyleSheet.create({
   },
   containerTitle: {
     paddingHorizontal: 35,
+    flexDirection: 'row'
   },
   upperTitle: {
     fontSize: 30,
