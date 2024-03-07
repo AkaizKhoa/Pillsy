@@ -17,19 +17,50 @@ export default function ReminderNotifications({ route }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState('');
   const [isNoteFilled, setIsNoteFilled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const [reminders, setReminders] = useState([]);
 
   const memoizedRemindData = useMemo(() => remindData, []);
   
-  const { remindData } = route.params || []; 
+  // const { remindData } = route.params || []; 
+  const remindData = [
+    {
+      dosage_per_day: 1,
+      end_date: "2024-03-09T00:00:00",
+      frequency_afternoon: 0,
+      frequency_evening: 1,
+      frequency_morning: 1,
+      name: "Cetirizine Hightamine",
+      quantity_per_dose: 2,
+      record_id: "e8d62787-7553-438f-b51c-b1d948de0c53",
+      start_date: "2024-03-08T00:00:00",
+      total_quantity: 2,
+      unit: "viên",
+    },
+    {
+      dosage_per_day: 1,
+      end_date: "2024-03-09T00:00:00",
+      frequency_afternoon: 0,
+      frequency_evening: 0,
+      frequency_morning: 0,
+      name: "Cetimed An",
+      quantity_per_dose: 2,
+      record_id: "8c4bc3d6-bb8f-4b47-9f65-9c396a95bef2",
+      start_date: "2024-03-08T00:00:00",
+      total_quantity: 2,
+      unit: "viên",
+    },]
 
  
 
 
 
   useEffect(() => {
+    setIsLoading(true)
+
+    loadReminders()
 
     // Khởi động dữ liệu từ AsyncStorage khi component mount
     registerForPushNotificationsAsync();
@@ -42,7 +73,6 @@ export default function ReminderNotifications({ route }) {
     };
     Notifications.setNotificationHandler(notificationHandler);
  
-    loadReminders()
   }, []);
 
   useEffect(() => {
@@ -62,7 +92,7 @@ export default function ReminderNotifications({ route }) {
             // Kiểm tra các frequency để set thời gian cho reminder
             if (item.frequency_morning === 1) {
               const morningDate = new Date(date);
-              morningDate.setHours(4, 6, 0, 0);
+              morningDate.setHours(8, 0, 0, 0);
               handleAddReminder(morningDate, item.name);
               scheduleNotificationAsync(morningDate, item.name);
 
@@ -81,6 +111,13 @@ export default function ReminderNotifications({ route }) {
               scheduleNotificationAsync(eveningDate, item.name);
 
 
+            }
+            if (item.frequency_morning === 0 && item.frequency_afternoon === 0 && item.frequency_evening === 0 ) {
+              const morningDate = new Date(date);
+              morningDate.setHours(8, 0, 0, 0);
+              handleAddReminder(morningDate, item.name);
+              scheduleNotificationAsync(morningDate, item.name);
+              
             }
           }
         }
@@ -101,8 +138,11 @@ export default function ReminderNotifications({ route }) {
         setReminders(JSON.parse(remindersData));
       
       }
+      setIsLoading(false)
     } catch (error) {
       console.error('Failed to load reminders:', error);
+      setIsLoading(false)
+
     }
   };
 
@@ -287,8 +327,16 @@ export default function ReminderNotifications({ route }) {
   };
 
   return (
-    <SafeAreaView >
-      <View style={{ marginTop: 50 }}>
+    <SafeAreaView style={{ flex: 1, justifyContent: 'center', }}>
+      {isLoading ? (
+<View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20 }}>
+          <Image source={require("../assets/loading/giphy.gif")} />
+          <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
+        </View>
+        
+      
+      ) : (
+          <View style={{ marginTop: 50 ,  flex: 1 }}>
         <View style={styles.arrowBackContainer}>
           <Pressable style={({ pressed }) => pressed && styles.pressedItem}
             onPress={() => {
@@ -400,6 +448,7 @@ export default function ReminderNotifications({ route }) {
         </View>
 
       </View>
+      )}
     </SafeAreaView>
   );
 }
