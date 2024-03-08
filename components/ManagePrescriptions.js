@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, FlatList, Image } from "react-native";
+import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, FlatList, Image, ImageBackground, SafeAreaView } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import DotCard from "../assets/icon/dot-card.svg"
 import IconSearch from "../assets/icon/search-icon.svg"
@@ -14,7 +14,7 @@ export default function ManagePrescriptions() {
 
     const [prescription, setPrescription] = useState("");
     const [listPres, setListPres] = useState([])
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigation = useNavigation();
 
@@ -57,90 +57,109 @@ export default function ManagePrescriptions() {
 
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={{ flex: 1 }}>
             {isLoading ? (
-                <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20 }}>
-                    <Image source={require("../assets/loading/prescription.gif")} />
-                    <Text style={{ fontSize: 20, fontWeight: "600" }}>Loading....</Text>
-                </View>
-            ) : (
-                <View>
-                    <View style={styles.arrowBackContainer}>
-                        <Pressable style={({ pressed }) => pressed && styles.pressedItem}
-                            onPress={() => {
-                                navigation.navigate("MainScreen")
+                <ImageBackground source={require("../assets/edit_background_6.jpg")} style={{ flex: 1 }} resizeMode="cover">
 
-                            }}>
-                            <ArrowBackLeft />
-                        </Pressable>
-                    </View>
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20, }}>
+                        <View >
+                            <Text style={{ fontSize: 30, fontWeight: "700", color: "#000", }}>P I L L S Y</Text>
+                        </View>
+                        <Image source={require("../assets/loading/giphy4.gif")} />
+                        <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
+                        <View style={{ padding: 10, borderWidth: 1, borderColor: "#000", backgroundColor: "#B6FFFA", borderRadius: 10 }}>
+                            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#211951" }}>
+                                Bạn có biết:
+                            </Text>
+                            <Text style={{ fontStyle: "italic", fontSize: 15, fontWeight: "500", }}>
+                                "Tuổi thọ của bạn phụ thuộc vào sức khỏe, còn sức khỏe như thế nào sẽ do bạn quyết định."
 
-                    <View style={styles.containerTitle}>
-                        <Text style={styles.upperTitle}>Manage Prescriptions</Text>
-                    </View>
-                    <View style={styles.containerSearch}>
-                        <View style={styles.groupSeacrh}>
-                            <IconSearch style={styles.searchIcon} />
-                            <TextInput style={styles.inputSearch} value={prescription} onChangeText={setPrescription}   >
-                            </TextInput>
+                            </Text>
                         </View>
                     </View>
 
+                </ImageBackground>
+            ) : (
+                <View style={styles.container}>
 
-                    <FlatList
-                        contentContainerStyle={styles.listPrescription}
-                        data={listPres}
-                        showsVerticalScrollIndicator={true}
-                        renderItem={({ item: data, index }) => (
-                            <View style={styles.cardPrescription}>
-                                <DotCard />
-                                <View style={styles.groupText}>
-                                    <Text style={styles.title}>
-                                        Đơn thuốc
-                                    </Text>
-                                    <View style={styles.groupCreatedDate}>
-                                        <Text style={styles.contextTitle}>Ngày scan đơn thuốc: </Text>
-                                        <Text>{data.createdDate ? format(parseISO(data.createdDate), 'dd-MM-yyyy') : 'N/A'}</Text>
+                    <View>
+                        <View style={styles.arrowBackContainer}>
+                            <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+                                onPress={() => {
+                                    navigation.navigate("MainScreen")
 
-                                    </View>
-                                    <View style={styles.context}>
-                                        <Text style={styles.contextTitle}>Triệu chứng: </Text>
-                                        <Text>{data.diagnosis}</Text>
-                                    </View>
-                                    <Text style={styles.contextPill}>
-                                        Các viên thuốc:
-                                    </Text>
-                                    <FlatList
-                                        data={data.pills}
-                                        renderItem={({ item }) => (
-                                            <View style={styles.pillItem}>
-                                                <Text style={styles.pillName}> ⚫ {item.pillName}</Text>
-                                                <Text style={styles.pillQuantity}>{item.quantity} {item.unit}</Text>
-                                                <Text style={styles.pillDosage}>{item.dosage_per_day}/Ngày</Text>
-                                                <View style={styles.pillTimeline}>
-                                                    <Text style={styles.HSD}>Thời hạn: </Text>
-                                                    <Text style={styles.pillDate}> {item.dateStart ? format(parseISO(item.dateStart), 'dd-MM-yyyy') : 'N/A'} - {item.dateEnd ? format(parseISO(item.dateEnd), 'dd-MM-yyyy') : 'N/A'}</Text>
-                                                </View>
+                                }}>
+                                <ArrowBackLeft />
+                            </Pressable>
+                        </View>
 
-
-                                            </View>
-                                        )}
-                                        keyExtractor={(item, index) => index.toString()}
-                                    />
-                                </View>
+                        <View style={styles.containerTitle}>
+                            <Text style={styles.upperTitle}>Manage Prescriptions</Text>
+                        </View>
+                        <View style={styles.containerSearch}>
+                            <View style={styles.groupSeacrh}>
+                                <IconSearch style={styles.searchIcon} />
+                                <TextInput style={styles.inputSearch} value={prescription} onChangeText={setPrescription}   >
+                                </TextInput>
                             </View>
-                        )}
-                        keyExtractor={(data, index) => index.toString()}
-                    />
+                        </View>
+
+
+                        <FlatList
+                            contentContainerStyle={styles.listPrescription}
+                            data={listPres}
+                            showsVerticalScrollIndicator={true}
+                            renderItem={({ item: data, index }) => (
+                                <View style={styles.cardPrescription}>
+                                    <DotCard />
+                                    <View style={styles.groupText}>
+                                        <Text style={styles.title}>
+                                            Đơn thuốc
+                                        </Text>
+                                        <View style={styles.groupCreatedDate}>
+                                            <Text style={styles.contextTitle}>Ngày scan đơn thuốc: </Text>
+                                            <Text>{data.createdDate ? format(parseISO(data.createdDate), 'dd-MM-yyyy') : 'N/A'}</Text>
+
+                                        </View>
+                                        <View style={styles.context}>
+                                            <Text style={styles.contextTitle}>Triệu chứng: </Text>
+                                            <Text>{data.diagnosis}</Text>
+                                        </View>
+                                        <Text style={styles.contextPill}>
+                                            Các viên thuốc:
+                                        </Text>
+                                        <FlatList
+                                            data={data.pills}
+                                            renderItem={({ item }) => (
+                                                <View style={styles.pillItem}>
+                                                    <Text style={styles.pillName}> ⚫ {item.pillName}</Text>
+                                                    <Text style={styles.pillQuantity}>{item.quantity} {item.unit}</Text>
+                                                    <Text style={styles.pillDosage}>{item.dosage_per_day}/Ngày</Text>
+                                                    <View style={styles.pillTimeline}>
+                                                        <Text style={styles.HSD}>Thời hạn: </Text>
+                                                        <Text style={styles.pillDate}> {item.dateStart ? format(parseISO(item.dateStart), 'dd-MM-yyyy') : 'N/A'} - {item.dateEnd ? format(parseISO(item.dateEnd), 'dd-MM-yyyy') : 'N/A'}</Text>
+                                                    </View>
+
+
+                                                </View>
+                                            )}
+                                            keyExtractor={(item, index) => index.toString()}
+                                        />
+                                    </View>
+                                </View>
+                            )}
+                            keyExtractor={(data, index) => index.toString()}
+                        />
 
 
 
+
+                    </View>
 
                 </View>
             )}
 
-
-        </View>
+        </SafeAreaView>
     )
 }
 
