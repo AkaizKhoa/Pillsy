@@ -18,7 +18,7 @@ export default function ReminderNotifications({ route }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState('');
   const [isNoteFilled, setIsNoteFilled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
 
   const [reminders, setReminders] = useState([]);
@@ -73,7 +73,7 @@ export default function ReminderNotifications({ route }) {
 
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(false)
 
     loadReminders()
 
