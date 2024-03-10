@@ -7,45 +7,47 @@ import {
   Pressable,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect, useContext, useLayoutEffect } from "react";
 import DotCard from "../assets/icon/dot-card.svg";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
 
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { BASE_URL } from "../config";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 
-const fakeData = [
-  {
-    orderID: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    totalPrice: 2,
-    orderDetails: [
-      {
-        subscriptionPackage: {
-          packageType: "Premium",
-          period: 90,
-          currencyUnit: "USD",
-          createdDate: "2024-03-08T14:38:28.268Z",
-        },
-      },
-    ],
-  },
-];
+// const fakeData = [
+//   {
+//     orderID: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+//     totalPrice: 2,
+//     orderDetails: [
+//       {
+//         subscriptionPackage: {
+//           packageType: "Premium",
+//           period: 90,
+//           currencyUnit: "USD",
+//           createdDate: "2024-03-08T14:38:28.268Z",
+//         },
+//       },
+//     ],
+//   },
+// ];
 
 export default function PatientOrders() {
   const [order, setOrder] = useState("");
   const [listOrder, setListOrder] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const isFocused = useIsFocused();
 
   const navigation = useNavigation();
 
   const { userInfo } = useContext(AuthContext);
   const { userToken } = useContext(AuthContext);
 
-  //   orderDetails[0].subscriptionPackage.packageType period currencyUnit
+  //   orderDetails[0].subscriptionPackage.packageType period unitPrice currencyUnit
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -55,42 +57,43 @@ export default function PatientOrders() {
 
   useEffect(() => {
     const abortController = new AbortController();
-    setListOrder(fakeData);
-    setIsLoading(false);
 
-    // const url = `${BASE_URL}/api/orders/all-orders/patient/${userInfo.PatientId}`;
+    const url = `${BASE_URL}/api/orders/all-orders/patient/${userInfo.PatientId}`;
 
-    // const fetchData = async () => {
-    //   try {
-    //     setIsLoading(true);
-    //     const response = await axios.get(url, {
-    //       signal: abortController.signal,
-    //       headers: {
-    //         Authorization: "Bearer " + userToken,
-    //       },
-    //     });
-    //     // console.log(response.data);
-    //     const listOrder = response.data;
-    //     setListOrder(listOrder);
-    //   } catch (error) {
-    //     if (error.response && error.response.status === 404) {
-    //       setListOrder([]);
-    //     }
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(url, {
+          signal: abortController.signal,
+          headers: {
+            Authorization: "Bearer " + userToken,
+          },
+        });
+        // console.log(response.data);
+        const listOrderData = response.data;
+        listOrderData.sort(
+          (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
+        );
+        setListOrder(listOrderData);
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          setListOrder([]);
+        }
 
-    //     if (abortController.signal.aborted) {
-    //       console.log("Data fetching cancelled");
-    //     } else {
-    //       // Handle error
-    //     }
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
+        if (abortController.signal.aborted) {
+          console.log("Data fetching cancelled");
+        } else {
+          // Handle error
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // fetchData();
+    fetchData();
 
     return () => abortController.abort("Data fetching cancelled");
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
@@ -104,7 +107,7 @@ export default function PatientOrders() {
           }}
         >
           {/* <Image source={require("../assets/loading/order.gif")} /> */}
-          <Text style={{ fontSize: 20, fontWeight: "600" }}>Loading....</Text>
+          <ActivityIndicator size="large" />
         </View>
       ) : (
         <View>
@@ -127,9 +130,9 @@ export default function PatientOrders() {
             contentContainerStyle={styles.listOrdercription}
             data={listOrder}
             showsVerticalScrollIndicator={true}
-            renderItem={({ item: data, index }) => {
-              let sPackage = data.orderDetails[0].subscriptionPackage;
-              let createdDate = new Date(sPackage.createdDate);
+            renderItem={({ item, index }) => {
+              let sPackage = item.orderDetails[0].subscriptionPackage;
+              let createdDate = new Date(item.createdDate);
               let newDate = new Date(
                 createdDate.getTime() + sPackage.period * 24 * 60 * 60 * 1000
               );
@@ -162,7 +165,7 @@ export default function PatientOrders() {
                     <View style={styles.context}>
                       <Text style={styles.contextTitle}>Thanh toán: </Text>
                       <Text>
-                        {data.totalPrice} {sPackage.currencyUnit}
+                        {sPackage.unitPrice} {sPackage.currencyUnit}
                       </Text>
                     </View>
                   </View>
@@ -226,8 +229,8 @@ const styles = StyleSheet.create({
   },
   listOrdercription: {
     paddingHorizontal: 35,
-    marginTop: 15,
     margin: 10,
+    marginBottom: 30,
   },
   cardPrescription: {
     width: "100%",
@@ -236,6 +239,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     marginVertical: 10,
+    marginBottom: 20,
   },
 
   shadowedContent: {},

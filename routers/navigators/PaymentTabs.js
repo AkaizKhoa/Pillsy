@@ -19,11 +19,13 @@ export function PaymentTabs() {
           elevation: 0,
           overflow: "hidden",
           paddingBottom: 10,
+          height: 60,
+          paddingTop: 10,
         },
       }}
     >
       <Tab.Screen
-        name="PaymentPackage"
+        name="PayPackage"
         component={PaymentPackage}
         options={{
           tabBarLabel: "Payment Package",
