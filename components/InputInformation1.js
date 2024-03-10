@@ -50,13 +50,13 @@ export default function InputInformation1({ route }) {
   const [openDate, setOpenDate] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errors, setErrors] = useState({});
-  
+
   const today = new Date();
-// const endDate = getFormatedDate(today.setDate(today.getDate()), 'DD/MM/YYYY')
+  // const endDate = getFormatedDate(today.setDate(today.getDate()), 'DD/MM/YYYY')
 
-let endDate = moment(today.setDate(today.getDate()), 'DD-MM-YYYY').format('DD-MM-YYYY')
+  let endDate = moment(today.setDate(today.getDate()), 'DD-MM-YYYY').format('DD-MM-YYYY')
 
-const { email, password } = route.params;
+  const { email, password } = route.params;
   const [gender, setGender] = React.useState([]);
 
   const [firstName, setFirstName] = useState(null);
@@ -97,18 +97,18 @@ const { email, password } = route.params;
     }
     if (!phoneNumber) {
       errors.phoneNumber = '*PhoneNumber is required.';
-    }else if(phoneNumber.length > 10 || phoneNumber.length < 9){
+    } else if (phoneNumber.length > 10 || phoneNumber.length < 9) {
       errors.phoneNumber = '*Phone number must have 10 digits'
     }
     if (gender.length === 0) {
       errors.gender = '*Gender is required.';
     }
-   
+
 
     // Set the errors and update form validity 
     setErrors(errors);
     console.log("So loi co dc: ", Object.keys(errors).length);
-    
+
     setIsFormValid(Object.keys(errors).length === 0);
   };
 
@@ -133,7 +133,7 @@ const { email, password } = route.params;
 
         })
         .then((res) => {
-          
+
           const responseData = res.data;
           console.log("Response Data:", responseData);
 
@@ -145,7 +145,7 @@ const { email, password } = route.params;
               button: 'close',
               onPressButton: navigation.navigate("SignupLogin2")
             })
-            
+
             console.log("SignUp successfully");
           } else {
             console.log("SignUp failed");
@@ -160,7 +160,7 @@ const { email, password } = route.params;
             title: 'SignUp is fail!',
             textBody: 'Something error , try again',
             button: 'close',
-            
+
           })
         })
         .finally(() => {
@@ -178,12 +178,12 @@ const { email, password } = route.params;
 
   function handleOnPress() {
     setOpenDate(!openDate)
- 
+
   }
   function handleChangeDate(propDate) {
     const selectedDate = moment(propDate, 'YYYY/MM/DD');
     const currentDate = moment();
-    
+
     // Kiểm tra xem ngày sinh được chọn có lớn hơn ngày hiện tại không
     if (selectedDate.isAfter(currentDate)) {
       // Nếu có, hiển thị thông báo lỗi và không cho phép ghi nhận ngày đó
@@ -201,7 +201,7 @@ const { email, password } = route.params;
       setOpenDate(false); // Đóng modal ngày sinh sau khi chọn
     }
   }
-  
+
 
 
 
@@ -217,169 +217,169 @@ const { email, password } = route.params;
     return undefined;
   }
 
-  
 
 
- 
- 
 
-  
+
+
+
+
 
 
 
   return (
     <AlertNotificationRoot>
 
-    <View style={styles.container}>
-      <View style={styles.arrowBackContainer}>
-        <Pressable
-          style={({ pressed }) => pressed && styles.pressedItem}
+      <View style={styles.container}>
+        <View style={styles.arrowBackContainer}>
+          <Pressable
+            style={({ pressed }) => pressed && styles.pressedItem}
             onPress={() => {
               navigation.navigate("SignupLogin3")
 
-          }}
-        >
-          <ArrowBackLeft />
-        </Pressable>
-      </View>
-      <ScrollView style={styles.screen}>
-        <KeyboardAvoidingView style={styles.screen} behavior="position">
-          <View style={styles.contactContainer}>
-            <Text style={[styles.contactText, { fontFamily: "Inter-Bold" }]}>
-              Who are you?
-            </Text>
-            <Text
-              style={[styles.contactSuggestText, { fontFamily: "Inter-Bold" }]}
-            >
-              Please provide more information about yourself
-            </Text>
-
-            <View style={styles.inputContainer}>
-              <View style={styles.firstNameInputContainer}>
-                <Text style={styles.labelInput}>First Name</Text>
-                <Text style={styles.error}>{errors.firstName}</Text>
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Your first name"
-                  value={firstName}
-                  onChangeText={text => setFirstName(text)}
-                />
-              </View>
-              <View style={styles.lastNameInputContainer}>
-                <Text style={styles.labelInput}>Last Name</Text>
-                <Text style={styles.error}>{errors.lastName}</Text>
-
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Your last name"
-                  value={lastName}
-                  onChangeText={text => setLastName(text)}
-                />
-              </View>
-              <View style={styles.addressInputContainer}>
-                <Text style={styles.labelInput}>Address</Text>
-                <Text style={styles.error}>{errors.address}</Text>
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Your address "
-                  value={address}
-                  onChangeText={text => setAddress(text)}
-                />
-              </View>
-              <View style={styles.phoneNumberInputContainer}>
-                <Text style={styles.labelInput}>PhoneNumber</Text>
-                <Text style={styles.error}>{errors.phoneNumber}</Text>
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Your phoneNumber "
-                  keyboardType="number-pad"
-                  value={phoneNumber}
-                  onChangeText={text => {
-                    // Validate the input to ensure it is within the desired range
-                    const number = parseInt(text, 10);
-                    if (!isNaN(number) && (number <= 10 || number > 9)) {
-                      setPhoneNumber(text);
-                    }
-                  }}
-                />
-              </View>
-              <View style={styles.dateOfBirthInputContainer}>
-                <Text style={styles.labelInput}>Date Of Birth</Text>
-                <Text style={styles.error}>{errors.dateOfBirth}</Text>
-
-                <View style={styles.selectedDob}>
-                <Pressable onPress={handleOnPress}>
-                  <Text style={styles.selectedDateText}>Selected your date of birth</Text>
-                </Pressable>
-                </View>
-                <Text style={styles.resultDOB}>{dateOfBirth}</Text>
-                <Modal animationType="slide"
-                  transparent={true}
-                  visible={openDate}>
-                  <View style={styles.centeredDateView}>
-                    <View style={styles.modalDateView}>
-                      <DatePicker 
-                      mode="calendar"
-                       selected={dateOfBirth} 
-                       onDateChange={handleChangeDate}
-                       maximumDate={endDate}
-                       >
-
-                      </DatePicker>
-
-
-                      <Pressable onPress={handleOnPress}>
-                        <Text>Close</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </Modal>
-
-              </View>
-
-              <View style={styles.emailInputContainer}>
-                <Text style={styles.labelInput}>Gender</Text>
-                <Text style={styles.error}>{errors.gender}</Text>
-
-                <SelectList
-                  setSelected={setGender}
-                  data={genderData}
-                  label="Gender"
-                  placeholder="Your Gender"
-                  boxStyles={{
-                    minWidth: 300,
-                    maxWidth: 300,
-                    maxHeight: 50,
-                    backgroundColor: "#F3F3F3",
-                  }}
-                  maxHeight={100}
-                  dropdownStyles={{ backgroundColor: "#F3F3F3" }}
-                  
-                />
-              </View>
-            </View>
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.buttonStyle,
-                  pressed ? styles.pressedItem : null,
-                ]}
-                onPress={
-                  () => {signUp(firstName, lastName, dateOfBirth, gender, phoneNumber, address)}
-                }
-                disabled={!isFormValid}
+            }}
+          >
+            <ArrowBackLeft />
+          </Pressable>
+        </View>
+        <ScrollView style={styles.screen}>
+          <KeyboardAvoidingView style={styles.screen} behavior="position">
+            <View style={styles.contactContainer}>
+              <Text style={[styles.contactText, { fontFamily: "Inter-Bold" }]}>
+                Who are you?
+              </Text>
+              <Text
+                style={[styles.contactSuggestText, { fontFamily: "Inter-Bold" }]}
               >
-                <Text style={[styles.buttonText, { fontFamily: "Inter-Bold" }]}>
-                  Complete
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-     
-      </ScrollView>
+                Please provide more information about yourself
+              </Text>
 
-    </View>
+              <View style={styles.inputContainer}>
+                <View style={styles.firstNameInputContainer}>
+                  <Text style={styles.labelInput}>First Name</Text>
+                  <Text style={styles.error}>{errors.firstName}</Text>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Your first name"
+                    value={firstName}
+                    onChangeText={text => setFirstName(text)}
+                  />
+                </View>
+                <View style={styles.lastNameInputContainer}>
+                  <Text style={styles.labelInput}>Last Name</Text>
+                  <Text style={styles.error}>{errors.lastName}</Text>
+
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Your last name"
+                    value={lastName}
+                    onChangeText={text => setLastName(text)}
+                  />
+                </View>
+                <View style={styles.addressInputContainer}>
+                  <Text style={styles.labelInput}>Address</Text>
+                  <Text style={styles.error}>{errors.address}</Text>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Your address "
+                    value={address}
+                    onChangeText={text => setAddress(text)}
+                  />
+                </View>
+                <View style={styles.phoneNumberInputContainer}>
+                  <Text style={styles.labelInput}>PhoneNumber</Text>
+                  <Text style={styles.error}>{errors.phoneNumber}</Text>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Your phoneNumber "
+                    keyboardType="number-pad"
+                    value={phoneNumber}
+                    onChangeText={text => {
+                      // Validate the input to ensure it is within the desired range
+                      const number = parseInt(text, 10);
+                      if (!isNaN(number) && (number <= 10 || number > 9)) {
+                        setPhoneNumber(text);
+                      }
+                    }}
+                  />
+                </View>
+                <View style={styles.dateOfBirthInputContainer}>
+                  <Text style={styles.labelInput}>Date Of Birth</Text>
+                  <Text style={styles.error}>{errors.dateOfBirth}</Text>
+
+                  <View style={styles.selectedDob}>
+                    <Pressable onPress={handleOnPress}>
+                      <Text style={styles.selectedDateText}>Selected your date of birth</Text>
+                    </Pressable>
+                  </View>
+                  <Text style={styles.resultDOB}>{dateOfBirth}</Text>
+                  <Modal animationType="slide"
+                    transparent={true}
+                    visible={openDate}>
+                    <View style={styles.centeredDateView}>
+                      <View style={styles.modalDateView}>
+                        <DatePicker
+                          mode="calendar"
+                          selected={dateOfBirth}
+                          onDateChange={handleChangeDate}
+                          maximumDate={endDate}
+                        >
+
+                        </DatePicker>
+
+
+                        <Pressable onPress={handleOnPress}>
+                          <Text>Close</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  </Modal>
+
+                </View>
+
+                <View style={styles.emailInputContainer}>
+                  <Text style={styles.labelInput}>Gender</Text>
+                  <Text style={styles.error}>{errors.gender}</Text>
+
+                  <SelectList
+                    setSelected={setGender}
+                    data={genderData}
+                    label="Gender"
+                    placeholder="Your Gender"
+                    boxStyles={{
+                      minWidth: 300,
+                      maxWidth: 300,
+                      maxHeight: 50,
+                      backgroundColor: "#F3F3F3",
+                    }}
+                    maxHeight={100}
+                    dropdownStyles={{ backgroundColor: "#F3F3F3" }}
+
+                  />
+                </View>
+              </View>
+              <View style={styles.buttonContainer}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.buttonStyle,
+                    pressed ? styles.pressedItem : null,
+                  ]}
+                  onPress={
+                    () => { signUp(firstName, lastName, dateOfBirth, gender, phoneNumber, address) }
+                  }
+                  disabled={!isFormValid}
+                >
+                  <Text style={[styles.buttonText, { fontFamily: "Inter-Bold" }]}>
+                    Complete
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+
+        </ScrollView>
+
+      </View>
     </AlertNotificationRoot>
 
   );
@@ -443,10 +443,10 @@ const styles = StyleSheet.create({
     borderColor: "#000",
   },
 
-  dateOfBirthInputContainer:{
+  dateOfBirthInputContainer: {
     marginTop: 10,
   },
-  selectedDob:{
+  selectedDob: {
     backgroundColor: "#F3F3F3",
     width: 300,
     height: 50,
@@ -455,11 +455,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 10
   },
-  selectedDateText:{
+  selectedDateText: {
     color: "#000"
   },
-  resultDOB:{
-    
+  resultDOB: {
+
   },
   labelInput: {
     color: "#575757",
@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
   },
 
 
-  
+
 
 
 

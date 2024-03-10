@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView, Button, Image, TouchableOpacity, Pressable, FlatList, TextInput, Modal, Alert, ScrollView, } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Button, Image, TouchableOpacity, Pressable, FlatList, TextInput, Modal, Alert, ScrollView, Animated, ImageBackground } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
@@ -24,6 +24,11 @@ import moment from 'moment';
 import CheckBox from 'react-native-check-box';
 import { format } from 'date-fns';
 import CloseIcon from "react-native-vector-icons/AntDesign"
+import WarningIcon from "react-native-vector-icons/AntDesign"
+
+import EditIcon from "react-native-vector-icons/Feather"
+import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
+
 
 import {
   MultipleSelectList,
@@ -38,6 +43,9 @@ export default function Scan() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false)
   const { userToken } = useContext(AuthContext);
+
+  const [errors, setErrors] = useState({})
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const [image, setImage] = useState(null);
   const [data, setData] = useState(null);
@@ -111,16 +119,25 @@ export default function Scan() {
         axios.post(uploadImageURL, formData, { headers })
           .then((response) => {
             // Handle the response from the API
-            console.log(">>>>>Res:", response);
-            console.log('API Response:', response.data);
+            // console.log(">>>>>Res:", response);
+            // console.log('API Response:', response.data);
+            console.log("Bat dau setImage: ", response.data.image);
             setImage(response.data.image);
             setData(response.data)
-            console.log("Data:", data);
+            // console.log("Data:", data);
             // Add any additional logic based on the API response
           })
           .catch((error) => {
             console.error('API Error:', error.response || error);
             // Handle errors if needed
+            setIsLoading(false);
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Fail!',
+              textBody: 'Some incidents happened! Please try again',
+
+            })
+
           })
           .finally(() => {
             setIsLoading(false);
@@ -131,7 +148,14 @@ export default function Scan() {
       // Handle errors if needed
     }
   };
+  // useEffect(() => {
+  //   if (image) {
+  //     // setImage(image);
+  //     console.log(" 3 Image cập nhật: ", image);
+  //   }
 
+
+  // }, [image]);
   useEffect(() => {
     console.log("Data2 updated:", data2);
 
@@ -143,44 +167,85 @@ export default function Scan() {
     }
   }, [data2]);
 
+  const neonLight = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(neonLight, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true
+        }),
+        Animated.timing(neonLight, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true
+        })
+      ])
+    );
+
+    animation.start();
+
+    return () => animation.stop();
+  }, []);
+  const borderColorInterpolation = neonLight.interpolate({
+    inputRange: [0, 1, 1],
+    outputRange: ['#5C11FF', '#cbb7f7', '#490dce']
+  });
+
   const confirmAction = () => {
-    const secondApiEndpoint = `${BASE_URL}/api/v1/prescription-management/prescriptions/return-predict-info`;
+    setImage(null)
+    setIsLoading(true)
 
-    const requestData = {
-      status: data.status,
-      user_Id: data.user_Id,
-      prescription_Id: data.prescription_Id,
-      data: data.data,
-      image: image,  // Use the image from state
-      error: data.error
-    };
+    try {
+      const secondApiEndpoint = `${BASE_URL}/api/v1/prescription-management/prescriptions/return-predict-info`;
 
-    const headers = {
-      'Authorization': 'Bearer ' + userToken,
-      'Content-Type': 'application/json', // Set content type to 'multipart/form-data'
-    };
+      const requestData = {
+        status: data.status,
+        user_Id: data.user_Id,
+        prescription_Id: data.prescription_Id,
+        data: data.data,
+        image: image,  // Use the image from state
+        error: data.error
+      };
 
-    axios.post(secondApiEndpoint, requestData, { headers })
-      .then((secondApiResponse) => {
-        // Handle the response from the second API
-        console.log("Data trả về", secondApiResponse);
-        // console.log("Data cần set vào remind: ", secondApiResponse.data.Data.medication_records);
-        setData2(secondApiResponse.data.prescriptionCreateDto.data.medication_records);
-        setDataToSaveDB(secondApiResponse.data)
-        // console.log('====================================');
-        // console.log("Data2", data2);
-        // console.log('====================================');
+      const headers = {
+        'Authorization': 'Bearer ' + userToken,
+        'Content-Type': 'application/json', // Set content type to 'multipart/form-data'
+      };
 
+      axios.post(secondApiEndpoint, requestData, { headers })
+        .then((secondApiResponse) => {
+          // Handle the response from the second API
+          console.log("Data trả về", secondApiResponse);
+          // console.log("Data cần set vào remind: ", secondApiResponse.data.Data.medication_records);
+          setData2(secondApiResponse.data.prescriptionCreateDto.data.medication_records);
+          setDataToSaveDB(secondApiResponse.data)
+          // console.log('====================================');
+          // console.log("Data2", data2);
+          // console.log('====================================');
+        })
+        .catch((error) => {
+          console.error('Second API Error:', error.response || error);
+          Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Fail!',
+            textBody: 'Some incidents happened! Please try again',
+          })
+        })
+        .finally(() => {
+          setIsLoading(false); // Moved into finally block
+        });
+    } catch (error) {
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Fail!',
+        textBody: 'Some incidents happened! Please try again',
 
-
-        setImage(null);
       })
-      .catch((error) => {
-        console.error('Second API Error:', error.response || error);
-        setImage(null);
+      setIsLoading(false)
 
-        // Handle errors if needed
-      });
+    }
   };
 
   useEffect(() => {
@@ -193,16 +258,41 @@ export default function Scan() {
     })();
   }, []);
 
-
   useEffect(() => {
-    // Assume 'response' is the API response
-    if (image) {
-      setImage(image);
+
+
+    validateForm();
+  }, [pillName, dosagePerDay, quantityPerDose, unitUpdate]);
+
+  const validateForm = () => {
+    let errors = {};
+
+    // Validate name field 
+    if (!pillName) {
+      errors.pillName = '*PillName is required.';
+    }
+    if (!dosagePerDay) {
+      errors.dosagePerDay = '*DosagePerDay is required.';
+    } else if (dosagePerDay === '0') {
+      errors.dosagePerDay = '* DosagePerDay cannot be 0.';
+    }
+    if (!quantityPerDose) {
+      errors.quantityPerDose = '*QuantityPerDose is required.';
+    } else if (quantityPerDose === '0') {
+      errors.quantityPerDose = '* DosagePerDay cannot be 0.';
+    }
+    if (!unitUpdate) {
+      errors.unitUpdate = '*Unit is required.';
+    } else if (!isNaN(unitUpdate)) {
+      errors.unitUpdate = 'Please enter the unit of the medication.';
     }
 
 
-  }, [image]);
+    setErrors(errors);
+    console.log("So loi co dc: ", Object.keys(errors).length);
 
+    setIsFormValid(Object.keys(errors).length === 0);
+  }
 
   if (hasCameraPermission === undefined) {
     return <Text>Requesting permissions...</Text>
@@ -235,8 +325,13 @@ export default function Scan() {
       setData(response.data);
     } catch (error) {
       console.error('API Error:', error.response || error);
+      setIsLoading(false);
+
+
     } finally {
       setIsLoading(false);
+      setPhoto(null)
+
     }
   };
 
@@ -245,13 +340,28 @@ export default function Scan() {
 
   let takePic = async () => {
     let options = {
-      quality: 1,
-      base64: true,
-      exif: false
+      exif: true,
+
     };
 
     let newPhoto = await cameraRef.current.takePictureAsync(options);
-    setPhoto(newPhoto);
+    // Quay ảnh theo chiều dọc
+    let manipulatedImage = await manipulateAsync(
+      newPhoto.uri,
+      [{ rotate: 0 }],
+      { format: 'jpeg' }
+    );
+
+    // Thay đổi kích thước ảnh nếu cần thiết (tùy chọn)
+    let resizedImage = await manipulateAsync(
+      manipulatedImage.uri,
+      [{ resize: { width: newPhoto.width, height: newPhoto.height } }]
+    );
+
+    setPhoto(resizedImage);
+
+
+
   };
 
   if (photo) {
@@ -269,57 +379,103 @@ export default function Scan() {
 
     };
 
-    const handleScanImage = () => {
+    const handleScanImage = async () => {
       if (photo) {
-        uploadPhoto(photo);
+        try {
+
+          uploadPhoto(photo);
+        } catch (error) {
+          console.error('Error manipulating image:', error);
+        }
       } else {
-        // Hiển thị thông báo rằng chưa chụp ảnh
       }
     };
 
 
 
 
+
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', }}>
+
+        {isLoading ? (<ImageBackground source={require("../assets/edit_background_10.jpg")} style={{ flex: 1 }} resizeMode="cover">
+
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20, }}>
+            <View >
+              <Text style={{ fontSize: 30, fontWeight: "700", color: "#fff", }}>P I L L S Y</Text>
+            </View>
+            <Image source={require("../assets/loading/giphy.gif")} />
+            <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
+            <View style={{ padding: 10, borderWidth: 1, borderColor: "#000", backgroundColor: "#B6FFFA", borderRadius: 10 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#211951" }}>
+                Bạn có biết:
+              </Text>
+              <Text style={{ fontStyle: "italic", fontSize: 15, fontWeight: "500", }}>
+                "Giấc ngủ vàng là sợi dây liên kết trọn vẹn sức khỏe và cơ thể bạn."
+
+              </Text>
+            </View>
+          </View>
+
+        </ImageBackground>
+
+        ) : (<View style={{ flex: 1, justifyContent: 'center' }}>
+          <Animated.View style={{
+            width: "100", height: "78%", borderWidth: 1, borderRadius: 20, padding: 1, margin: 10, backgroundColor: '#171717',
+            shadowColor: '#5C11FF',
+            shadowOpacity: 1, shadowRadius: 7, borderColor: borderColorInterpolation
+          }}>
+            <Image style={{
+              width: "100%", height: "100%", resizeMode: 'stretch', borderRadius: 20,
 
 
-        <Image style={styles.preview} source={{ uri: "data:image/jpg;base64," + photo.base64 }} />
-        <View style={styles.buttonFeature}>
-          <TouchableOpacity
-            onPress={sharePic} style={styles.shareButton} >
-            <Text style={styles.textFeature}>Share</Text>
 
-            <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonFeature}>
-          <TouchableOpacity
-            onPress={handleScanImage} style={styles.pickButton} >
-            <Text style={styles.textFeature}>ScanImage</Text>
+            }} source={{ uri: photo.uri }} />
+          </Animated.View>
+          <View style={{}}>
+            <View style={{ flexDirection: 'column', width: "100%", padding: 20, gap: 10, }}>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <View style={styles.buttonFeature}>
+                  <TouchableOpacity
+                    onPress={sharePic} style={styles.shareButton} >
+                    <Text style={styles.textFeature}>Share</Text>
 
-            <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonFeature}>
+                    <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.buttonFeature}>
+                  <TouchableOpacity
+                    onPress={handleScanImage} style={styles.pickButton} >
+                    <Text style={styles.textFeature}>ScanImage</Text>
 
-          {hasMediaLibraryPermission ? <TouchableOpacity
-            onPress={savePhoto} style={styles.saveButton} >
-            <Text style={styles.textFeature}>Save</Text>
+                    <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <View style={styles.buttonFeature}>
 
-            <IconSave style={{ fontSize: 25, }} name='arrow-down-bold-box-outline'></IconSave>
-          </TouchableOpacity> : undefined}
-        </View>
-        <View style={styles.buttonFeature}>
-          <TouchableOpacity
-            onPress={() => setPhoto(undefined)} style={styles.discardButton}>
-            <Text style={styles.textFeature}>Discard</Text>
+                  {hasMediaLibraryPermission ? <TouchableOpacity
+                    onPress={savePhoto} style={styles.saveButton} >
+                    <Text style={styles.textFeature}>Save</Text>
 
-            <IconDiscard style={{ fontSize: 22, }} name='closesquare'></IconDiscard>
-          </TouchableOpacity>
-        </View>
+                    <IconSave style={{ fontSize: 25, }} name='arrow-down-bold-box-outline'></IconSave>
+                  </TouchableOpacity> : undefined}
+                </View>
+                <View style={styles.buttonFeature}>
+                  <TouchableOpacity
+                    onPress={() => setPhoto(undefined)} style={styles.discardButton}>
+                    <Text style={styles.textFeature}>Discard</Text>
 
-      </View>
+                    <IconDiscard style={{ fontSize: 22, }} name='closesquare'></IconDiscard>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>)}
+
+      </SafeAreaView>
     );
   }
 
@@ -410,9 +566,17 @@ export default function Scan() {
     console.log('====================================');
   }
 
+
+
   const onPressSaveEdit = () => {
-    handleEditItem(editItem);
-    setIsModalVisible(false)
+    validateForm()
+    if (isFormValid) {
+      handleEditItem(editItem);
+      setIsModalVisible(false)
+    } else {
+
+    }
+
   }
 
 
@@ -422,8 +586,10 @@ export default function Scan() {
         style={styles.touchData}
         onPress={() => onPressItem(item)}
       >
-        <Text style={styles.text}>{item.name}</Text>
-
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={{ color: "#211951", fontSize: 15, fontWeight: "500" }}>{item.name}</Text>
+          <EditIcon name='edit-2' size={15}></EditIcon>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -435,6 +601,7 @@ export default function Scan() {
 
 
   const handleSubmitDataScan = () => {
+    setIsLoading(true)
     const thirdApiEndpoint = `${BASE_URL}/api/v1/prescription-management/prescriptions/upload-predict-info`;
 
     const requestData = {
@@ -460,6 +627,8 @@ export default function Scan() {
     axios.post(thirdApiEndpoint, requestData, { headers })
       .then((thirdApiResponse) => {
         console.log("Data trả về", thirdApiResponse);
+        setIsLoading(false)
+
         Dialog.show({
           type: ALERT_TYPE.SUCCESS,
           title: 'Success',
@@ -479,8 +648,7 @@ export default function Scan() {
       })
       .catch((error) => {
         console.error('Third API Error:', error.response || error);
-        setImage(null);
-
+        setIsLoading(false)
         // Handle errors if needed
       });
   }
@@ -489,256 +657,355 @@ export default function Scan() {
 
   return (
     <AlertNotificationRoot>
-      <View style={styles.container}>
 
-        {image && (
-          <View style={styles.overlayBackground}>
-            <View style={styles.containerPopUp}>
-              <View style={styles.confirmContainer}>
-                <Image source={{ uri: `data:image/jpg;base64,` + image }} style={styles.confirmImage} />
-                <TouchableOpacity
-                  style={styles.confirmButton}
-                  onPress={() => {
-                    confirmAction();
-                  }}
-                >
-                  <Text style={styles.confirmButtonText}>Confirm</Text>
-                </TouchableOpacity>
-              </View>
+    <SafeAreaView style={{ flex: 1,}}>
+    {isLoading ? (<ImageBackground source={require("../assets/edit_background_9.jpg")} style={{ flex: 1 }} resizeMode="cover">
+
+<View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20, }}>
+  <View>
+    <Text style={{ fontSize: 30, fontWeight: "700" }}>P I L L S Y</Text>
+  </View>
+  <Image source={require("../assets/loading/giphy1.gif")} />
+  <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
+  <View style={{ padding: 10, borderWidth: 1, borderColor: "#000", backgroundColor: "#B6FFFA", borderRadius: 10 }}>
+    <Text style={{ fontSize: 18, fontWeight: "bold", color: "#211951" }}>
+      Bạn có biết:
+    </Text>
+    <Text style={{ fontStyle: "italic", fontSize: 15, fontWeight: "500", }}>
+      "Thuốc có thể tạm thời giúp bạn bớt đau, nhưng thuốc không thể thay thế cho vận động. Ngược lại, vận động hầu như thay thế cho mọi loại thuốc."
+
+    </Text>
+  </View>
+</View>
+
+</ImageBackground>) : (
+<View style={styles.container}>
+
+  {image && (
+    <View style={styles.overlayBackground}>
+      <View style={styles.containerPopUp}>
+        <View style={styles.confirmContainer}>
+
+          <View style={{ width: "100%", alignItems: 'center', justifyContent: 'flex-end', flexDirection: "row", backgroundColor: "#72FFFF", borderTopLeftRadius: 10, borderTopRightRadius: 10,  }}>
+            <View style={{ width: "50%", flexDirection: "row", backgroundColor: "#2B4865",  borderRadius: 5, flex: 1, justifyContent:"center", marginHorizontal: 10 }}>
+              <Text style={{ color: '#fff', fontWeight: "700", fontSize: 20, paddingHorizontal: 5 }}>Pillsy Scan!</Text>
+              {/* <Image source={require('../assets/icon.png')} style={{ width: 30, height: 30, borderRadius: 10, paddingHorizontal: 5 }}></Image> */}
             </View>
-          </View>
-        )}
-
-
-        {data2IsSet && (
-          <View style={styles.overlayBackgroundTwo}>
-            <View style={styles.containerPopUpTwo}>
-              <View style={{ width: "100%", alignItems: 'center', justifyContent: 'flex-end', flexDirection: "row" }}>
-                <TouchableOpacity onPress={handleCloseFlatlist}>
-                  <CloseIcon name='closesquare' size={45}></CloseIcon>
-                </TouchableOpacity>
-              </View>
-
-              <FlatList
-                contentContainerStyle={styles.listUpdateData}
-                data={dataToHold}
-                renderItem={renderPillsItem}
-                keyExtractor={item => item.record_id.toString()}
-                extraData={isRender}
-              >
-
-
-              </FlatList>
-              <TouchableOpacity style={styles.confirmButton} onPress={handleSubmitDataScan}>
-                <Text>Submit</Text>
+            <View style={{flex: 0}}>
+              <TouchableOpacity onPress={() => setImage(null)}>
+                <CloseIcon color={"#000"} name='closesquare' size={45}></CloseIcon>
               </TouchableOpacity>
-              <Modal
-                animationType='fade'
-                visible={isModalVisible}
-                onRequestClose={() => setIsModalVisible(false)}
-              >
-
-                <View style={styles.modalView}>
-                  <View style={{ width: "100%", height: "auto", }}>
-                    <Text style={{ fontSize: 28, textAlign: 'center', fontWeight: "700" }}>Pill update!</Text>
-                  </View>
-                  <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
-                    <Text style={styles.text}>Tên thuốc: </Text>
-                    <TextInput
-                      style={styles.textInput}
-                      onChangeText={(text) => setPillName(text)}
-                      defaultValue={pillName}
-                      editable={true}
-                      multiline={false}
-                      maxLength={200}
-                    >
-                    </TextInput>
-                  </View>
-
-                  <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
-                    <Text style={styles.text}> Số cử thuốc: </Text>
-                    <TextInput
-                      style={styles.textInput}
-                      onChangeText={(text) => setDosagePerDay(text)}
-                      keyboardType='numeric'
-                      defaultValue={dosagePerDay.toString()}
-                      editable={true}
-                      multiline={false}
-                      maxLength={200}
-                    >
-                    </TextInput>
-
-                  </View>
-
-                  <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
-                    <Text style={styles.text}> Số viên thuốc trong 1 cử thuốc: </Text>
-                    <TextInput
-                      style={styles.textInput}
-                      onChangeText={(text) => setQuantityPerDose(text)}
-                      keyboardType='numeric'
-                      defaultValue={quantityPerDose.toString()}
-                      editable={true}
-                      multiline={false}
-                      maxLength={200}
-                    >
-                    </TextInput>
-
-                  </View>
-
-
-                  <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
-                    <Text style={styles.text}>Ngày quét:</Text>
-                    <Text style={{ flex: 6, width: "50%", borderRadius: 10, borderColor: 'grey', borderWidth: 1, fontSize: 15, paddingLeft: 10, height: "auto", textAlign: 'center' }}
-                    >{format(dateStart, 'dd-MM-yyyy')}</Text>
-
-                  </View>
-
-                  <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
-                    <Text style={styles.text} >Ngày hết hạn:</Text>
-                    <Text style={{ flex: 6, width: "50%", borderRadius: 10, borderColor: 'grey', borderWidth: 1, fontSize: 15, paddingLeft: 10, height: "auto", textAlign: 'center' }}>{format(dateEnd, 'dd-MM-yyyy')}</Text>
-                  </View>
-                  <TouchableOpacity style={{ width: 200, backgroundColor: 'orange', alignItems: 'center', padding: 10, borderRadius: 10, marginVertical: 10 }} onPress={handleDateTextClick}>
-                    <Text style>Chọn ngày hết hạn khác</Text>
-                  </TouchableOpacity>
-                  {showDatePicker && (
-                    <View style={styles.overlayBackgroundTwo}>
-
-                      <DatePicker
-                        mode="calendar"
-                        selectedDate={dateEnd}
-                        onDateChange={handleChangeDate}
-                        style={styles.modalDate}
-                        placeholder="Ngày hết hạn"
-                        current={dateEnd}
-                      />
-                    </View>
-                  )}
-
-                  <View style={{ flexDirection: "row" }}>
-                    <CheckBox
-                      style={{ flex: 1, padding: 10 }}
-
-                      onClick={() => {
-                        setMorning(!morning);
-                      }}
-                      isChecked={morning == 1 ? true : false}
-                      leftText={"Sáng"}
-                      placeholder="Sáng"
-                    />
-
-
-                    <CheckBox
-                      style={{ flex: 1, padding: 10 }}
-
-                      onClick={() => {
-                        setAfternoon(!afternoon);
-                      }}
-                      isChecked={afternoon == 1 ? true : false}
-                      leftText={"Chiều"}
-                      placeholder="Chiều"
-                    />
-
-                    <CheckBox
-                      style={{ flex: 1, padding: 10 }}
-
-                      onClick={() => {
-                        setEvening(!evening);
-                      }}
-                      isChecked={evening == 1 ? true : false}
-                      leftText={"Tối"}
-                      placeholder="Tối"
-                    />
-                  </View>
-
-                  <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", alignItems: "center" }}>
-                    <Text style={styles.text}>Đơn vị: </Text>
-                    <TextInput
-                      style={{ flex: 6, width: "50%", borderRadius: 10, borderColor: 'grey', borderWidth: 1, fontSize: 15, paddingLeft: 10, height: 50 }}
-                      value={unitUpdate}
-                      onChangeText={text => setUnit(text)}
-                      placeholder="Đơn vị"
-                    />
-
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => onPressSaveEdit()}
-                    style={styles.touchableSave}
-                  >
-                    <View>
-                      <Text style={{ width: "100%", padding: 10 }}>Save</Text>
-                    </View>
-                  </TouchableOpacity>
-
-                </View>
-
-              </Modal>
-
             </View>
           </View>
-        )}
 
 
 
-
-
-        <View style={styles.arrowBackContainer}>
-          <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+          <Image source={{ uri: `data:image/jpg;base64,` + image }} style={styles.confirmImage} />
+          <TouchableOpacity
+            style={styles.confirmButton}
             onPress={() => {
-              navigation.navigate("MainScreen")
-
-            }}>
-            <ArrowBackLeft />
-          </Pressable>
+              confirmAction();
+            }}
+          >
+            <Text style={styles.confirmButtonText}>Confirm</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.containerText}>
-          <Text style={styles.title}>
-            Scan prescription
-          </Text>
+      </View>
+    </View>
+  )}
 
-          <Text style={styles.instruction}>
-            Please scan your prescription or medication barcode in order our AI to detect it automatically
-          </Text>
+
+  {data2IsSet && (
+    <View style={styles.overlayBackgroundTwo}>
+      <View style={styles.containerPopUpTwo}>
+        <View style={{ width: "100%", alignItems: 'center', justifyContent: 'flex-end', flexDirection: "row", backgroundColor: "#83C0C1" }}>
+          <TouchableOpacity style={{ marginHorizontal: 5, marginVertical: 5 }} onPress={handleCloseFlatlist}>
+            <CloseIcon name='closesquare' size={45}></CloseIcon>
+          </TouchableOpacity>
         </View>
 
+     <View style={{borderWidth:2, borderColor: "#FF1E1E"}}>
+     <View style={{ width: "100%", justifyContent: "space-around", paddingHorizontal: 20, flexDirection: "row", alignItems: 'center', backgroundColor: "",}}>
 
-        <View style={styles.containerFrame}>
-          <Camera style={styles.containerCamera} ref={cameraRef}>
+<Text style={{ width: "100%", fontWeight: "bold", fontSize: 20, color: "#FF004D" }}>*Lưu ý: </Text>
+<WarningIcon name='warning' size={30} style={{paddingTop: 5}}></WarningIcon>
+</View>
+<View style={{ width: "100%", alignItems: 'flex-start', paddingHorizontal: 10 }}>
 
-            <StatusBar style="auto" />
-          </Camera>
-        </View>
-        <View style={styles.buttonGroup}>
-          <View style={styles.buttonContainer} >
-            {/* <Button style={styles.button} title='' onPress={takePic}></Button> */}
-            <TouchableOpacity
-              style={styles.button}
-              onPress={takePic}>
-              <View style={styles.groupIconCircle}>
-                <IconCircle1 style={styles.iconCircle}>
-                </IconCircle1>
-                <IconCircle2 style={styles.iconCircle2} />
+<Text style={{ width: "100%", fontWeight: "500", fontSize: 15 }}>Xác nhận lại thông tin thuốc của bạn:</Text>
+</View>
+     </View>
+        <ImageBackground source={require('../assets/edit_background_7.jpg')} style={{ flex: 1 }} resizeMode='cover'>
+          <FlatList
+            contentContainerStyle={styles.listUpdateData}
+            data={dataToHold}
+            renderItem={renderPillsItem}
+            keyExtractor={item => item.record_id.toString()}
+            extraData={isRender}
+          >
+
+          </FlatList>
+          <TouchableOpacity style={styles.confirmButton} onPress={handleSubmitDataScan}>
+            <Text style={{ fontSize: 15, fontWeight: "bold" }}>Submit</Text>
+          </TouchableOpacity>
+        </ImageBackground>
+        <Modal
+          animationType='fade'
+          visible={isModalVisible}
+          onRequestClose={() => setIsModalVisible(false)}
+          style={{}}
+        >
+          <Image source={require('../assets/edit_background_6.jpg')} style={{ position: "absolute", width: "100%", height: "100%", }}></Image>
+
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flex: 1 }}>
+            <View style={styles.modalView}>
+              <View style={{
+                width: "50%", height: "auto", flexDirection: "row", justifyContent: 'center', backgroundColor: "#FB88B4", borderRadius: 20, alignItems: 'center', ...Platform.select({
+                  ios: {
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                  },
+                  android: {
+                    elevation: 5,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                  },
+                }),
+              }}>
+                <Image source={require('../assets/pill_edit.png')} style={{ width: 30, height: 30, }}></Image>
+                <Text style={{ fontSize: 28, textAlign: 'center', fontWeight: "700", marginHorizontal: 5, }}>Pill update!</Text>
+
+              </View>
+              <Text style={styles.error}>{errors.pillName}</Text>
+              <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
+                <Text style={styles.text}>Tên thuốc: </Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={(text) => setPillName(text)}
+                  defaultValue={pillName}
+                  editable={true}
+                  multiline={false}
+                  maxLength={200}
+                >
+                </TextInput>
               </View>
 
-            </TouchableOpacity>
-          </View>
-          <View style={styles.groupButtonSelect}>
-            <View style={styles.buttonContainer}>
+              <Text style={styles.error}>{errors.dosagePerDay}</Text>
+              <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
+
+                <Text style={styles.text}> Số cử thuốc: </Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={(text) => setDosagePerDay(text)}
+                  keyboardType='numeric'
+                  defaultValue={dosagePerDay.toString()}
+                  editable={true}
+                  multiline={false}
+                  maxLength={200}
+                >
+                </TextInput>
+
+              </View>
+
+              <Text style={styles.error}>{errors.quantityPerDose}</Text>
+              <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
+
+                <Text style={styles.text}> Số viên thuốc trong 1 cử thuốc: </Text>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={(text) => setQuantityPerDose(text)}
+                  keyboardType='numeric'
+                  defaultValue={quantityPerDose.toString()}
+                  editable={true}
+                  multiline={false}
+                  maxLength={200}
+                >
+                </TextInput>
+
+              </View>
+
+
+              <View style={{
+                flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center',
+              }}>
+                <Text style={styles.text}>Ngày quét:</Text>
+                <View style={{ width: "50%", flex: 6, backgroundColor: "#FF8080", borderRadius: 10 }}>
+                  <Text style={{ borderRadius: 10, fontSize: 15, paddingLeft: 10, height: "auto", textAlign: 'center', fontWeight: "bold" }}>{format(dateStart, 'dd-MM-yyyy')}</Text>
+                </View>
+
+              </View>
+
+              <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center', }}>
+                <Text style={styles.text} >Ngày hết hạn:</Text>
+                <View style={{ width: "50%", flex: 6, backgroundColor: "#CDFADB", borderRadius: 10 }}>
+                  <Text style={{ borderRadius: 10, fontSize: 15, paddingLeft: 10, height: "auto", textAlign: 'center', fontWeight: "bold" }}>{format(dateEnd, 'dd-MM-yyyy')}</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={{
+                width: 200, backgroundColor: '#15F5BA', alignItems: 'center', padding: 10, borderRadius: 10, marginVertical: 10,
+
+                ...Platform.select({
+                  ios: {
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                  },
+                  android: {
+                    elevation: 2,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.8,
+                  },
+                })
+              }} onPress={handleDateTextClick}>
+                <Text style>Chọn ngày hết hạn khác</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <View style={styles.overlayBackgroundTwo}>
+
+                  <DatePicker
+                    mode="calendar"
+                    selectedDate={dateEnd}
+                    onDateChange={handleChangeDate}
+                    style={styles.modalDate}
+                    placeholder="Ngày hết hạn"
+                    current={dateEnd}
+                  />
+                </View>
+              )}
+
+              <View style={{ flexDirection: "row" }}>
+                <CheckBox
+                  style={{ flex: 1, padding: 10 }}
+
+                  onClick={() => {
+                    setMorning(!morning);
+                  }}
+                  isChecked={morning == 1 ? true : false}
+                  leftText={"Sáng"}
+                  placeholder="Sáng"
+                />
+
+
+                <CheckBox
+                  style={{ flex: 1, padding: 10 }}
+
+                  onClick={() => {
+                    setAfternoon(!afternoon);
+                  }}
+                  isChecked={afternoon == 1 ? true : false}
+                  leftText={"Chiều"}
+                  placeholder="Chiều"
+                />
+
+                <CheckBox
+                  style={{ flex: 1, padding: 10 }}
+
+                  onClick={() => {
+                    setEvening(!evening);
+                  }}
+                  isChecked={evening == 1 ? true : false}
+                  leftText={"Tối"}
+                  placeholder="Tối"
+                />
+              </View>
+
+              <Text style={styles.error}>{errors.unitUpdate}</Text>
+              <View style={{ flexDirection: "row", justifyContent: 'center', width: "100%", marginVertical: 10, alignItems: 'center' }}>
+
+                <Text style={styles.text}>Đơn vị: </Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={unitUpdate}
+                  onChangeText={text => setUnitUpdate(text)}
+                  placeholder="Đơn vị"
+                />
+
+              </View>
               <TouchableOpacity
-                style={styles.button}
-                onPress={pickImage}  // Add this onPress handler for image selection
+                onPress={() => onPressSaveEdit()}
+                style={styles.touchableSave}
               >
-                <View style={styles.groupIconCircle}>
-                  {/* Display an icon or text for image selection */}
-                  <IconImagePicker style={styles.iconImagePicker} width="60" height="60" />
+                <View>
+                  <Text style={{ width: "100%", padding: 10, fontSize: 20, fontWeight: "bold" }}>Save</Text>
                 </View>
               </TouchableOpacity>
+
             </View>
-          </View>
-        </View>
-        {selectedImage && (
-          <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />
-        )}
+          </ScrollView>
+
+        </Modal>
+
       </View>
+    </View>
+  )}
+
+
+
+
+
+  <View style={styles.arrowBackContainer}>
+    <Pressable style={({ pressed }) => pressed && styles.pressedItem}
+      onPress={() => {
+        navigation.navigate("MainScreen")
+
+      }}>
+      <ArrowBackLeft />
+    </Pressable>
+  </View>
+  <View style={styles.containerText}>
+    <Text style={styles.title}>
+      Scan prescription
+    </Text>
+
+    <Text style={styles.instruction}>
+      Please scan your prescription or medication barcode in order our AI to detect it automatically
+    </Text>
+  </View>
+
+
+  <View style={styles.containerFrame}>
+    <Camera style={styles.containerCamera} ref={cameraRef} pictureOrientation="portrait">
+
+      <StatusBar style="auto" />
+    </Camera>
+  </View>
+  <View style={styles.buttonGroup}>
+    <View style={styles.buttonContainer} >
+      {/* <Button style={styles.button} title='' onPress={takePic}></Button> */}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={takePic}>
+        <View style={styles.groupIconCircle}>
+          <IconCircle1 style={styles.iconCircle}>
+          </IconCircle1>
+          <IconCircle2 style={styles.iconCircle2} />
+        </View>
+
+      </TouchableOpacity>
+    </View>
+    <View style={styles.groupButtonSelect}>
+      <View style={styles.buttonContainerSelect}>
+        <TouchableOpacity
+          style={{}}
+          onPress={pickImage}  // Add this onPress handler for image selection
+        >
+          <View style={{}}>
+            {/* Display an icon or text for image selection */}
+            <IconImagePicker style={{}} width="60" height="60" />
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+  {selectedImage && (
+    <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />
+  )}
+</View>
+)}
+    </SafeAreaView>
     </AlertNotificationRoot>
   );
 }
@@ -755,7 +1022,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "auto",
     gap: 5,
-    paddingHorizontal: 40
+    paddingHorizontal: 40,
   },
   title: {
     fontSize: 30,
@@ -764,7 +1031,7 @@ const styles = StyleSheet.create({
   },
   instruction: {
     fontSize: 18,
-    color: "#8C94A6"
+    color: "#8C94A6",
 
   },
   containerFrame: {
@@ -782,16 +1049,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonContainer: {
-    // backgroundColor: '#000',
     borderRadius: 20,
     width: 80,
     alignItems: 'center',
 
   },
   groupButtonSelect: {
-    position: "absolute",
-    justifyContent: "flex-start",
-    width: "100%"
+    padding: 8, borderRadius: 50, right: 100
+  },
+  buttonContainerSelect: {
+
+    alignItems: 'center',
+
   },
   iconImagePicker: {
     justifyContent: 'center',
@@ -804,7 +1073,21 @@ const styles = StyleSheet.create({
     // opacity: 0.5,
     borderRadius: 20,
     alignItems: 'center',
+    width: "100%",
+    zIndex: 10,
+    position: "absolute"
 
+  },
+  groupIconCircleImage: {
+    backgroundColor: "yellow"
+  },
+  buttonSelectImage: {
+    // backgroundColor: "blue",
+    // opacity: 0.5,
+    borderRadius: 20,
+    width: "100%",
+    backgroundColor: "blue",
+    zIndex: 100, position: "absolute"
 
   },
   buttonGroup: {
@@ -822,19 +1105,26 @@ const styles = StyleSheet.create({
     position: "absolute"
 
   },
+
   preview: {
-    alignSelf: 'stretch',
-    flex: 1
+    width: "100%",
+    height: "85%"
   },
   buttonFeature: {
-    width: "100%",
+    flex: 1,
   },
   shareButton: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 15,
-    backgroundColor: "#F9E8D9"
+    backgroundColor: "#F9E8D9",
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
 
 
   },
@@ -843,7 +1133,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 15,
-    backgroundColor: "#F9E8D9"
+    backgroundColor: "#96EFFF",
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
 
 
   },
@@ -852,7 +1148,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 15,
-    backgroundColor: "#cfc"
+    backgroundColor: "#cfc",
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
 
   },
   discardButton: {
@@ -860,6 +1162,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 15,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
+
   },
   textFeature: {
     fontSize: 18,
@@ -872,13 +1182,13 @@ const styles = StyleSheet.create({
   },
 
   confirmButton: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
+    backgroundColor: "#15F5BA",
+    padding: 20,
     borderRadius: 5,
     alignItems: 'center',
   },
   confirmButtonText: {
-    color: 'white',
+    color: '#000',
     fontWeight: 'bold',
   },
 
@@ -889,7 +1199,21 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'scroll'
+    overflow: 'scroll',
+    padding: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+      },
+      android: {
+        elevation: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+      },
+    }),
   },
   overlayBackgroundTwo: {
     ...StyleSheet.absoluteFillObject,
@@ -903,10 +1227,25 @@ const styles = StyleSheet.create({
   },
   containerPopUpTwo: {
     position: "absolute",
-    width: "80%",
+    width: "90%",
     height: "80%",
     overflow: 'scroll',
     backgroundColor: "#fff",
+    borderRadius: 20,
+
+    ...Platform.select({
+      ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.8,
+      },
+      android: {
+          elevation: 20,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.8,
+      },
+  }),
   },
   listUpdateData: {
   },
@@ -916,14 +1255,18 @@ const styles = StyleSheet.create({
   touchData: {
     padding: 30,
     margin: 10,
-    borderWidth: 1,
-    borderRadius: 10
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: "#176B87"
   },
   confirmContainer: {
     flex: 1,
     position: "absolute",
     width: "100%",
     height: "50%",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
 
 
@@ -956,6 +1299,7 @@ const styles = StyleSheet.create({
   confirmImage: {
     width: "100%",
     height: "100%",
+    resizeMode: "stretch"
   },
   input: {
     borderWidth: 1,
@@ -975,23 +1319,27 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 15,
     fontWeight: 'bold',
-    marginLeft: 10,
     flex: 3,
+    paddingLeft: 10,
   },
   textInput: {
     flex: 6,
     width: "50%",
     borderRadius: 10,
-    borderColor: 'grey',
+    backgroundColor: '#F5F5F5',
+    borderColor: '#CED4DA',
     borderWidth: 1,
-    fontSize: 15,
-    paddingLeft: 10,
+    fontSize: 16,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 12,
+    paddingBottom: 12,
     height: 50
   },
   modalView: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   modalViewMeta: {
     flex: 1,
@@ -999,12 +1347,25 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   touchableSave: {
-    backgroundColor: "orange",
+    backgroundColor: "#5FBDFF",
     paddingHorizontal: "100",
     alignItems: 'center',
     marginTop: 20,
     width: "50%",
-    borderRadius: 20
+    borderRadius: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+      },
+      android: {
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+      },
+    }),
   },
   modalDate: {
     position: "absolute",
@@ -1017,5 +1378,11 @@ const styles = StyleSheet.create({
     borderColor: 'grey',
     fontSize: 15,
     height: 50
-  }
+  },
+  //error
+  error: {
+    color: 'red',
+    fontSize: 13,
+    fontWeight: "600"
+  },
 });
