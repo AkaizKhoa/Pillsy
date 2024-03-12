@@ -110,22 +110,20 @@ export default function PatientOrders() {
           <ActivityIndicator size="large" />
         </View>
       ) : (
-        <View>
+        <View style={{ flex: 1 }}>
           <View style={styles.arrowBackContainer}>
-            <Pressable
-              style={({ pressed }) => pressed && styles.pressedItem}
+            <Pressable style={({ pressed }) => pressed && styles.pressedItem}
               onPress={() => {
-                navigation.navigate("MainScreen");
-              }}
-            >
+                navigation.navigate("MainScreen")
+
+              }}>
               <ArrowBackLeft />
             </Pressable>
           </View>
-
           <View style={styles.containerTitle}>
-            <Text style={styles.upperTitle}>Lịch sử thanh toán</Text>
+            <Text style={styles.upperTitle} >Patient Orders</Text>
           </View>
-
+          
           <FlatList
             contentContainerStyle={styles.listOrdercription}
             data={listOrder}
@@ -140,9 +138,11 @@ export default function PatientOrders() {
                 <View style={styles.cardPrescription}>
                   <DotCard />
                   <View style={styles.groupText}>
+                    <View style={styles.borderBoxText}>
                     <Text style={styles.title}>
                       Package {sPackage.packageType || "N/A"}
                     </Text>
+                      </View>
                     <View style={styles.groupCreatedDate}>
                       <Text style={styles.contextTitle}>Ngày đăng kí: </Text>
                       <Text>
@@ -163,7 +163,7 @@ export default function PatientOrders() {
                       </Text>
                     </View>
                     <View style={styles.context}>
-                      <Text style={styles.contextTitle}>Thanh toán: </Text>
+                      <Text style={styles.contextTitle}> {sPackage.status === true ? 'Đã' : 'Chưa'} thanh toán: </Text>
                       <Text>
                         {sPackage.unitPrice} {sPackage.currencyUnit}
                       </Text>
@@ -183,8 +183,7 @@ export default function PatientOrders() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+   
   },
   arrowBackContainer: {
     width: 80,
@@ -196,7 +195,6 @@ const styles = StyleSheet.create({
   },
   containerTitle: {
     paddingHorizontal: 35,
-    marginBottom: 25,
   },
   upperTitle: {
     fontSize: 30,
@@ -236,10 +234,12 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "auto",
     padding: 10,
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 10,
     marginVertical: 10,
     marginBottom: 20,
+    borderColor:'#0C356A'
+    
   },
 
   shadowedContent: {},
@@ -278,4 +278,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  borderBoxText:{
+    borderWidth: 1,
+    borderColor: '#2E4F4F',
+    backgroundColor: "#87CBB9",
+    borderRadius: 10,
+    alignItems: "center"
+  }
 });

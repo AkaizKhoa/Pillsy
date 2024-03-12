@@ -10,7 +10,9 @@ import {
   KeyboardAvoidingView,
   Modal,
   TouchableOpacity,
-  Alert
+  Alert,
+  ImageBackground,
+  Image
 } from "react-native";
 import { useFonts } from "expo-font";
 import ArrowBackLeft from "../assets/icon/arrow_back_left.svg";
@@ -62,6 +64,7 @@ export default function InputInformation1({ route }) {
   const [firstName, setFirstName] = useState(null);
   const [lastName, setLastName] = useState(null);
   const [dateOfBirth, setDateOfBirth] = useState("");
+
   const genderData = [
     { key: "Nữ", value: "Nữ" },
     { key: "Nam", value: "Nam" },
@@ -112,14 +115,14 @@ export default function InputInformation1({ route }) {
     setIsFormValid(Object.keys(errors).length === 0);
   };
 
-  const signUp = (firstName, lastName, dateOfBirth, gender, phoneNumber, address) => {
-    validateForm();
+  const signUp =  async (firstName, lastName, dateOfBirth, gender, phoneNumber, address) => {
+     validateForm();
     console.log(errors);
     console.log(isFormValid);
     console.log(dateOfBirth);
+    setIsLoading(true);
     if (isFormValid) {
-      setIsLoading(true);
-      axios
+      await axios
         .post(`${BASE_URL}/api/v1/patients/sign-up`, {
           email: email,
           password: password,
@@ -158,7 +161,7 @@ export default function InputInformation1({ route }) {
           Dialog.show({
             type: ALERT_TYPE.DANGER,
             title: 'SignUp is fail!',
-            textBody: 'Something error , try again',
+            textBody: 'Something error, please check your email again',
             button: 'close',
 
           })
@@ -230,7 +233,26 @@ export default function InputInformation1({ route }) {
   return (
     <AlertNotificationRoot>
 
-      <View style={styles.container}>
+      {isLoading ? ( <ImageBackground source={require("../assets/edit_background_3.jpg")} style={{ flex: 1 }} resizeMode="cover">
+
+<View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20, }}>
+  <View >
+    <Text style={{ fontSize: 30, fontWeight: "700", color: "#fff", }}>P I L L S Y</Text>
+  </View>
+  <Image source={require("../assets/loading/giphy5.gif")} />
+  <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
+  <View style={{ padding: 10, borderWidth: 1, borderColor: "#000", backgroundColor: "#B6FFFA", borderRadius: 10 }}>
+    <Text style={{ fontSize: 18, fontWeight: "bold", color: "#211951" }}>
+      Bạn có biết:
+    </Text>
+    <Text style={{ fontStyle: "italic", fontSize: 15, fontWeight: "500", }}>
+    "Sức khỏe không phải là thứ chúng ta có thể mua. Tuy nhiên, nó có thể là một tài khoản tiết kiệm cực kỳ giá trị." - Anne Wilson Schaef.
+
+    </Text>
+  </View>
+</View>
+
+</ImageBackground>) : (<View style={styles.container}>
         <View style={styles.arrowBackContainer}>
           <Pressable
             style={({ pressed }) => pressed && styles.pressedItem}
@@ -379,7 +401,7 @@ export default function InputInformation1({ route }) {
 
         </ScrollView>
 
-      </View>
+      </View>)}
     </AlertNotificationRoot>
 
   );

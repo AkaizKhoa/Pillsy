@@ -16,7 +16,7 @@ import {
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { BASE_URL } from "../config";
-
+import { format } from "date-fns";
 import { AuthContext } from "../context/AuthContext";
 
 
@@ -77,7 +77,7 @@ export default function ProfileUserDetail() {
             <View style={styles.userInformationBoxItem}>
               <Text style={{ fontSize: 14, color: "#858C94" }}>DateOfBirth</Text>
               <Text style={{ fontWeight: "bold", fontSize: 14 }}>
-              {profile && profile.dateOfBirth}
+              {profile && format(new Date(profile.dateOfBirth), "dd/MM/yyyy")}
               </Text>
             </View>
             {/* GENDER */}

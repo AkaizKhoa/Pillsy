@@ -40,13 +40,7 @@ export default function PaymentPackage() {
   const { userToken } = useContext(AuthContext);
   const [orderInfo, setOrderInfo] = useState(null);
   const packages = [
-    {
-      id: 1,
-      name: "Basic",
-      number: 1,
-      price: 1,
-      subscriptionId: "b27301f2-6c11-4671-9962-3be7e32d5707",
-    },
+   
     {
       id: 2,
       name: "Premium",

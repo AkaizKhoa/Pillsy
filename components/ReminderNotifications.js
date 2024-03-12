@@ -18,7 +18,7 @@ export default function ReminderNotifications({ route }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState('');
   const [isNoteFilled, setIsNoteFilled] = useState(false);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const [reminders, setReminders] = useState([]);
@@ -55,7 +55,7 @@ export default function ReminderNotifications({ route }) {
   //   },
   //   {
   //     dosage_per_day: 1,
-  //     end_date: "2024-03-10T00:00:00",
+  //     end_date: "2024-03-14T00:00:00",
   //     frequency_afternoon: 0,
   //     frequency_evening: 0,
   //     frequency_morning: 1,
@@ -73,7 +73,6 @@ export default function ReminderNotifications({ route }) {
 
 
   useEffect(() => {
-    setIsLoading(false)
 
     loadReminders()
 
@@ -147,6 +146,8 @@ export default function ReminderNotifications({ route }) {
   }, [memoizedRemindData]);
 
   const loadReminders = async () => {
+    setIsLoading(true)
+
     try {
       const remindersData = await AsyncStorage.getItem('reminders');
       if (remindersData !== null) {
@@ -299,17 +300,32 @@ export default function ReminderNotifications({ route }) {
 
   const handleClearAllReminders = async () => {
     try {
-      // Xóa tất cả các lời nhắc khỏi state
-      setReminders([]);
-
-      // Xóa tất cả các lời nhắc đã lên lịch thông báo từ hệ thống thông báo
-      await Notifications.cancelAllScheduledNotificationsAsync();
-
-      // Xóa tất cả các lời nhắc đã lưu trong AsyncStorage
-      await AsyncStorage.removeItem('reminders');
-
-
-      Alert.alert('All reminders cleared successfully!');
+      // Hiển thị cảnh báo để xác nhận hành động xóa
+      Alert.alert(
+        'Confirmation',
+        'Are you sure you want to clear all reminders?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel'
+          },
+          {
+            text: 'Clear All',
+            onPress: async () => {
+              // Xóa tất cả các lời nhắc khỏi state
+              setReminders([]);
+  
+              // Xóa tất cả các lời nhắc đã lên lịch thông báo từ hệ thống thông báo
+              await Notifications.cancelAllScheduledNotificationsAsync();
+  
+              // Xóa tất cả các lời nhắc đã lưu trong AsyncStorage
+              await AsyncStorage.removeItem('reminders');
+  
+              Alert.alert('All reminders cleared successfully!');
+            }
+          }
+        ]
+      );
     } catch (error) {
       console.error('Failed to clear all reminders:', error);
       Alert.alert('Failed to clear all reminders. Please try again later.');
@@ -367,7 +383,8 @@ export default function ReminderNotifications({ route }) {
 
 
       ) : (
-        <View style={{ marginTop: 50, flex: 1 }}>
+       <View style={{flex: 1}}>
+         <View style={{ flex: 0 , paddingVertical: 10}}>
           <View style={styles.arrowBackContainer}>
             <Pressable style={({ pressed }) => pressed && styles.pressedItem}
               onPress={() => {
@@ -424,13 +441,10 @@ export default function ReminderNotifications({ route }) {
                       shadowOffset: { width: 0, height: 2 },
                       shadowOpacity: 0.8,
                     },
-                    android: {
-                      elevation: 5,
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.8,
-                    },
+                 
                   }),
+                  borderColor: '#64CCC5',
+                  borderWidth: 1
 
                 }}>
                   <Text style={{ fontWeight: "700" }}>Set up your remind! </Text>
@@ -447,8 +461,36 @@ export default function ReminderNotifications({ route }) {
               </TouchableOpacity>
             ) : ("")}
 
-            <FlatList
-              showsVerticalScrollIndicator={false}
+           
+
+
+            <DateTimePickerModal
+              isVisible={isDateTimePickerVisible}
+              mode="datetime"
+              onConfirm={date => {
+                const newDate = new Date(date);
+                newDate.setSeconds(0);
+                handleDatePicked(newDate);
+                scheduleNotificationAsync(newDate, note);
+                Keyboard.dismiss(); // Ẩn bàn phím
+              }}
+              onCancel={() => {
+                hideDateTimePicker();
+                Keyboard.dismiss(); // Ẩn bàn phím
+              }}
+              onHide={() => Keyboard.dismiss()} // Ẩn bàn phím khi DateTimePickerModal bị ẩn
+              display={Platform.OS === "ios" ? "calendar" : "default"}
+              modalStyleIOS={{}}
+              pickerStyleIOS={{ alignItems: 'center', paddingVertical: 20 }}
+
+            />
+
+          </View>
+
+        </View>
+        <View style={{ flex: 1, alignItems: "center",  }} >
+           <FlatList
+              showsVerticalScrollIndicator={false}  
               contentContainerStyle={styles.listDataReminder}
               data={groupRemindersByDate()}
               renderItem={({ item }) => (
@@ -481,32 +523,8 @@ export default function ReminderNotifications({ route }) {
               keyExtractor={(item, index) => index.toString()}
               keyboardShouldPersistTaps="handled"
             />
-
-
-            <DateTimePickerModal
-              isVisible={isDateTimePickerVisible}
-              mode="datetime"
-              onConfirm={date => {
-                const newDate = new Date(date);
-                newDate.setSeconds(0);
-                handleDatePicked(newDate);
-                scheduleNotificationAsync(newDate, note);
-                Keyboard.dismiss(); // Ẩn bàn phím
-              }}
-              onCancel={() => {
-                hideDateTimePicker();
-                Keyboard.dismiss(); // Ẩn bàn phím
-              }}
-              onHide={() => Keyboard.dismiss()} // Ẩn bàn phím khi DateTimePickerModal bị ẩn
-              display={Platform.OS === "ios" ? "calendar" : "default"}
-              modalStyleIOS={{}}
-              pickerStyleIOS={{ alignItems: 'center', paddingVertical: 20 }}
-
-            />
-
-          </View>
-
         </View>
+       </View>
       )}
     </SafeAreaView>
   );

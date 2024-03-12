@@ -77,6 +77,7 @@ export default function Scan() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation();
   const uploadImageEndpoint = `${BASE_URL}/api/v1/prescription-management/prescriptions/upload-ocr-image`;
+  
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -326,7 +327,12 @@ export default function Scan() {
     } catch (error) {
       console.error('API Error:', error.response || error);
       setIsLoading(false);
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Fail!',
+        textBody: 'Some incidents happened! Please try again',
 
+      })
 
     } finally {
       setIsLoading(false);
@@ -396,86 +402,88 @@ export default function Scan() {
 
 
     return (
-      <SafeAreaView style={{ flex: 1, justifyContent: 'center', }}>
+   <AlertNotificationRoot>
+       <SafeAreaView style={{ flex: 1, justifyContent: 'center', }}>
 
-        {isLoading ? (<ImageBackground source={require("../assets/edit_background_10.jpg")} style={{ flex: 1 }} resizeMode="cover">
+{isLoading ? (<ImageBackground source={require("../assets/edit_background_10.jpg")} style={{ flex: 1 }} resizeMode="cover">
 
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20, }}>
-            <View >
-              <Text style={{ fontSize: 30, fontWeight: "700", color: "#fff", }}>P I L L S Y</Text>
-            </View>
-            <Image source={require("../assets/loading/giphy.gif")} />
-            <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
-            <View style={{ padding: 10, borderWidth: 1, borderColor: "#000", backgroundColor: "#B6FFFA", borderRadius: 10 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#211951" }}>
-                Bạn có biết:
-              </Text>
-              <Text style={{ fontStyle: "italic", fontSize: 15, fontWeight: "500", }}>
-                "Giấc ngủ vàng là sợi dây liên kết trọn vẹn sức khỏe và cơ thể bạn."
+  <View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 20, }}>
+    <View >
+      <Text style={{ fontSize: 30, fontWeight: "700", color: "#fff", }}>P I L L S Y</Text>
+    </View>
+    <Image source={require("../assets/loading/giphy.gif")} />
+    <Text style={{ fontSize: 20, fontWeight: "600" }}>Chờ trong giây lát nhé....</Text>
+    <View style={{ padding: 10, borderWidth: 1, borderColor: "#000", backgroundColor: "#B6FFFA", borderRadius: 10 }}>
+      <Text style={{ fontSize: 18, fontWeight: "bold", color: "#211951" }}>
+        Bạn có biết:
+      </Text>
+      <Text style={{ fontStyle: "italic", fontSize: 15, fontWeight: "500", }}>
+        "Giấc ngủ vàng là sợi dây liên kết trọn vẹn sức khỏe và cơ thể bạn."
 
-              </Text>
-            </View>
-          </View>
+      </Text>
+    </View>
+  </View>
 
-        </ImageBackground>
+</ImageBackground>
 
-        ) : (<View style={{ flex: 1, justifyContent: 'center' }}>
-          <Animated.View style={{
-            width: "100", height: "78%", borderWidth: 1, borderRadius: 20, padding: 1, margin: 10, backgroundColor: '#171717',
-            shadowColor: '#5C11FF',
-            shadowOpacity: 1, shadowRadius: 7, borderColor: borderColorInterpolation
-          }}>
-            <Image style={{
-              width: "100%", height: "100%", resizeMode: 'stretch', borderRadius: 20,
+) : (<View style={{ flex: 1, justifyContent: 'center' }}>
+  <Animated.View style={{
+    width: "100", height: "78%", borderWidth: 1, borderRadius: 20, padding: 1, margin: 10, backgroundColor: '#171717',
+    shadowColor: '#5C11FF',
+    shadowOpacity: 1, shadowRadius: 7, borderColor: borderColorInterpolation
+  }}>
+    <Image style={{
+      width: "100%", height: "100%", resizeMode: 'stretch', borderRadius: 20,
 
 
 
-            }} source={{ uri: photo.uri }} />
-          </Animated.View>
-          <View style={{}}>
-            <View style={{ flexDirection: 'column', width: "100%", padding: 20, gap: 10, }}>
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                <View style={styles.buttonFeature}>
-                  <TouchableOpacity
-                    onPress={sharePic} style={styles.shareButton} >
-                    <Text style={styles.textFeature}>Share</Text>
+    }} source={{ uri: photo.uri }} />
+  </Animated.View>
+  <View style={{}}>
+    <View style={{ flexDirection: 'column', width: "100%", padding: 20, gap: 10, }}>
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <View style={styles.buttonFeature}>
+          <TouchableOpacity
+            onPress={sharePic} style={styles.shareButton} >
+            <Text style={styles.textFeature}>Share</Text>
 
-                    <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.buttonFeature}>
-                  <TouchableOpacity
-                    onPress={handleScanImage} style={styles.pickButton} >
-                    <Text style={styles.textFeature}>ScanImage</Text>
+            <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonFeature}>
+          <TouchableOpacity
+            onPress={handleScanImage} style={styles.pickButton} >
+            <Text style={styles.textFeature}>ScanImage</Text>
 
-                    <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                <View style={styles.buttonFeature}>
+            <IconShare style={{ fontSize: 25 }} name='inbox-arrow-up'></IconShare>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <View style={styles.buttonFeature}>
 
-                  {hasMediaLibraryPermission ? <TouchableOpacity
-                    onPress={savePhoto} style={styles.saveButton} >
-                    <Text style={styles.textFeature}>Save</Text>
+          {hasMediaLibraryPermission ? <TouchableOpacity
+            onPress={savePhoto} style={styles.saveButton} >
+            <Text style={styles.textFeature}>Save</Text>
 
-                    <IconSave style={{ fontSize: 25, }} name='arrow-down-bold-box-outline'></IconSave>
-                  </TouchableOpacity> : undefined}
-                </View>
-                <View style={styles.buttonFeature}>
-                  <TouchableOpacity
-                    onPress={() => setPhoto(undefined)} style={styles.discardButton}>
-                    <Text style={styles.textFeature}>Discard</Text>
+            <IconSave style={{ fontSize: 25, }} name='arrow-down-bold-box-outline'></IconSave>
+          </TouchableOpacity> : undefined}
+        </View>
+        <View style={styles.buttonFeature}>
+          <TouchableOpacity
+            onPress={() => setPhoto(undefined)} style={styles.discardButton}>
+            <Text style={styles.textFeature}>Discard</Text>
 
-                    <IconDiscard style={{ fontSize: 22, }} name='closesquare'></IconDiscard>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>)}
+            <IconDiscard style={{ fontSize: 22, }} name='closesquare'></IconDiscard>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>)}
 
-      </SafeAreaView>
+</SafeAreaView>
+   </AlertNotificationRoot>
     );
   }
 
@@ -679,13 +687,12 @@ export default function Scan() {
 </View>
 
 </ImageBackground>) : (
-<View style={styles.container}>
-
+  <View style={styles.container}>
   {image && (
     <View style={styles.overlayBackground}>
       <View style={styles.containerPopUp}>
         <View style={styles.confirmContainer}>
-
+  
           <View style={{ width: "100%", alignItems: 'center', justifyContent: 'flex-end', flexDirection: "row", backgroundColor: "#72FFFF", borderTopLeftRadius: 10, borderTopRightRadius: 10,  }}>
             <View style={{ width: "50%", flexDirection: "row", backgroundColor: "#2B4865",  borderRadius: 5, flex: 1, justifyContent:"center", marginHorizontal: 10 }}>
               <Text style={{ color: '#fff', fontWeight: "700", fontSize: 20, paddingHorizontal: 5 }}>Pillsy Scan!</Text>
@@ -697,9 +704,9 @@ export default function Scan() {
               </TouchableOpacity>
             </View>
           </View>
-
-
-
+  
+  
+  
           <Image source={{ uri: `data:image/jpg;base64,` + image }} style={styles.confirmImage} />
           <TouchableOpacity
             style={styles.confirmButton}
@@ -713,6 +720,7 @@ export default function Scan() {
       </View>
     </View>
   )}
+
 
 
   {data2IsSet && (
@@ -943,9 +951,8 @@ export default function Scan() {
   )}
 
 
-
-
-
+<View style={{ flex: 1, flexDirection: "column", justifyContent: "center", gap: 15}}>
+<View style={{marginTop: 30}}>
   <View style={styles.arrowBackContainer}>
     <Pressable style={({ pressed }) => pressed && styles.pressedItem}
       onPress={() => {
@@ -960,9 +967,12 @@ export default function Scan() {
       Scan prescription
     </Text>
 
-    <Text style={styles.instruction}>
+   <View style={styles.boxInstruction}>
+   <Text style={styles.instruction}>
       Please scan your prescription or medication barcode in order our AI to detect it automatically
     </Text>
+   </View>
+  </View>
   </View>
 
 
@@ -1000,6 +1010,10 @@ export default function Scan() {
       </View>
     </View>
   </View>
+</View>
+
+
+
   {selectedImage && (
     <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />
   )}
@@ -1014,9 +1028,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    height: "auto",
-    flexDirection: "column",
-    gap: 12
+  
   },
   containerText: {
     width: "100%",
@@ -1028,6 +1040,9 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#03358C",
     fontWeight: "600"
+  },
+  boxInstruction:{
+    alignItems: "center"
   },
   instruction: {
     fontSize: 18,
@@ -1079,7 +1094,6 @@ const styles = StyleSheet.create({
 
   },
   groupIconCircleImage: {
-    backgroundColor: "yellow"
   },
   buttonSelectImage: {
     // backgroundColor: "blue",
@@ -1093,6 +1107,7 @@ const styles = StyleSheet.create({
   buttonGroup: {
     width: "100%",
     alignItems: 'center',
+   
   },
   groupIconCircle: {
     width: "100%",
@@ -1178,7 +1193,7 @@ const styles = StyleSheet.create({
   arrowBackContainer: {
     width: 80,
     marginLeft: 20,
-    marginTop: 50
+    marginTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0,
   },
 
   confirmButton: {
