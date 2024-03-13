@@ -36,6 +36,7 @@ export default function PaymentPackage() {
   const [isOrderListLoading, setIsOrderListLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   const [activePackageId, setActivePackageId] = useState(0);
+  const [statusPakage, setStatusPakage] = useState(false)
   const isFocused = useIsFocused();
   const { userToken } = useContext(AuthContext);
   const [orderInfo, setOrderInfo] = useState(null);
@@ -124,6 +125,7 @@ export default function PaymentPackage() {
           },
         });
         const listOrder = response.data;
+        setStatusPakage(listOrder.status)
         listOrder.sort(
           (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
         );
@@ -214,8 +216,8 @@ export default function PaymentPackage() {
                   onPress={() => handleSelectPackage(item.id)}
                 >
                   <View style={styles.containerPackage}>
-                    {/* Is using badge */}
-                    {activePackageId === item.id && (
+                    {/* Chỗ này check activePackage == item.id thì nó hiển thị */}
+                    {activePackageId === item.id && statusPakage && (
                       <View style={styles.activeBadge}>
                         <Text style={{ color: "white" }}>Active</Text>
                       </View>
@@ -228,7 +230,8 @@ export default function PaymentPackage() {
                 </TouchableOpacity>
               )}
             />
-            {activePackageId !== 0 && orderInfo != null ? (
+            {/* Chỗ này check activeId == 1 và order ko rỗng thì active thời hạn */}
+            {activePackageId !== 0 && orderInfo != null && statusPakage ? (
               <Text
                 style={{ color: "red", textAlign: "center", marginTop: 20 }}
               >

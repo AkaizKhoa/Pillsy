@@ -163,7 +163,7 @@ export default function PatientOrders() {
                       </Text>
                     </View>
                     <View style={styles.context}>
-                      <Text style={styles.contextTitle}> {sPackage.status === true ? 'Đã' : 'Chưa'} thanh toán: </Text>
+                      <Text style={styles.contextTitle}> {sPackage.status === true ? 'Đã duyệt' : 'Chưa duyệt'} thanh toán: </Text>
                       <Text>
                         {sPackage.unitPrice} {sPackage.currencyUnit}
                       </Text>
