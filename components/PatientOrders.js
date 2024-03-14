@@ -69,7 +69,7 @@ export default function PatientOrders() {
             Authorization: "Bearer " + userToken,
           },
         });
-        // console.log(response.data);
+        console.log(response.data);
         const listOrderData = response.data;
         listOrderData.sort(
           (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
@@ -148,22 +148,22 @@ export default function PatientOrders() {
                       <Text>
                         {sPackage?.createdDate
                           ? format(
-                              parseISO(sPackage?.createdDate),
+                            createdDate,
                               "dd-MM-yyyy"
                             )
                           : "N/A"}
                       </Text>
                     </View>
-                    <View style={styles.groupCreatedDate}>
+                    {/* <View style={styles.groupCreatedDate}>
                       <Text style={styles.contextTitle}>Ngày hết hạn: </Text>
                       <Text>
                         {sPackage?.period
                           ? format(newDate, "dd-MM-yyyy")
                           : "N/A"}
                       </Text>
-                    </View>
+                    </View> */}
                     <View style={styles.context}>
-                      <Text style={styles.contextTitle}> {sPackage.status === true ? 'Đã duyệt' : 'Chưa duyệt'} thanh toán: </Text>
+                      <Text style={styles.contextTitle}> {item.status === true ?  'Đã' : 'Chưa'} thanh toán: </Text>
                       <Text>
                         {sPackage.unitPrice} {sPackage.currencyUnit}
                       </Text>

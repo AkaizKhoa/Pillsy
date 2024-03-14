@@ -125,12 +125,14 @@ export default function PaymentPackage() {
           },
         });
         const listOrder = response.data;
-        setStatusPakage(listOrder.status)
+        console.log(listOrder.status);
         listOrder.sort(
           (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
         );
         const firstItem = listOrder[0];
         let sPackage = firstItem.orderDetails[0].subscriptionPackage;
+        setStatusPakage(firstItem.status)
+
         let createdDate = new Date(firstItem.createdDate);
         let expDate = new Date(
           createdDate.getTime() + sPackage.period * 24 * 60 * 60 * 1000
@@ -164,6 +166,7 @@ export default function PaymentPackage() {
         setOrderInfo(null);
       } finally {
         setIsOrderListLoading(false);
+        console.log(statusPakage);
       }
     };
 

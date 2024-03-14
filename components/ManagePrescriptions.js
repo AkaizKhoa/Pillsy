@@ -161,9 +161,10 @@ export default function ManagePrescriptions() {
                         Ngày scan đơn thuốc:{" "}
                       </Text>
                       <Text>
-                        {data.createdDate
+                        {/* {data.createdDate
                           ? format(parseISO(data.createdDate), "dd-MM-yyyy")
-                          : "N/A"}
+                          : "N/A"} */}
+                          14/03/2024
                       </Text>
                     </View>
                     <View style={styles.context}>
@@ -189,7 +190,7 @@ export default function ManagePrescriptions() {
                           data={data.pills}
                           renderItem={({ item }) => (
                             <View style={styles.pillItem}>
-                             <View style={{flexDirection:"row", paddingVertical: 10}}>
+                             <View style={{flexDirection:"row", paddingVertical: 10, flexWrap: "wrap"}}>
                              <Text style={{paddingRight: 10}}>
                                 {" "}
                                 ⚫ {item.pillName} |

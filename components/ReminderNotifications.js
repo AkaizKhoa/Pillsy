@@ -73,7 +73,7 @@ export default function ReminderNotifications({ route }) {
 
 
   useEffect(() => {
-
+    
     loadReminders()
 
     // Khởi động dữ liệu từ AsyncStorage khi component mount
@@ -295,12 +295,27 @@ export default function ReminderNotifications({ route }) {
       console.error('Failed to delete reminder from AsyncStorage:', error);
     }
   };
-
+  const confirmDeleteReminder = (reminder, time, index) => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to delete this reminder?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => handleDeleteReminder(reminder, time, index),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
 
   const handleClearAllReminders = async () => {
     try {
-      // Hiển thị cảnh báo để xác nhận hành động xóa
       Alert.alert(
         'Confirmation',
         'Are you sure you want to clear all reminders?',
@@ -312,13 +327,10 @@ export default function ReminderNotifications({ route }) {
           {
             text: 'Clear All',
             onPress: async () => {
-              // Xóa tất cả các lời nhắc khỏi state
               setReminders([]);
   
-              // Xóa tất cả các lời nhắc đã lên lịch thông báo từ hệ thống thông báo
               await Notifications.cancelAllScheduledNotificationsAsync();
   
-              // Xóa tất cả các lời nhắc đã lưu trong AsyncStorage
               await AsyncStorage.removeItem('reminders');
   
               Alert.alert('All reminders cleared successfully!');
@@ -512,7 +524,7 @@ export default function ReminderNotifications({ route }) {
 
                       <Text>{`Note: ${reminder.note}`}</Text>
                       <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                        <TouchableOpacity onPress={() => handleDeleteReminder(reminder, item.time, index)} style={{ width: 60, height: 40, backgroundColor: "#D61355", justifyContent: 'center', alignItems: 'center', borderRadius: 10, }}>
+                        <TouchableOpacity onPress={() => confirmDeleteReminder(reminder, item.time, index)} style={{ width: 60, height: 40, backgroundColor: "#D61355", justifyContent: 'center', alignItems: 'center', borderRadius: 10, }}>
                           <Text style={{ color: '#fff', fontWeight: "bold" }}>Delete</Text>
                         </TouchableOpacity>
                       </View>
