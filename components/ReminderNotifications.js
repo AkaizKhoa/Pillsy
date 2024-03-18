@@ -191,21 +191,20 @@ export default function ReminderNotifications({ route }) {
 
   const scheduleNotificationAsync = async (date, note) => {
     try {
+      const futureDate = new Date(date.getTime() + 60000); // Add 1 minute to current time
       await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Pillsy',
-          body: `Nhắc nhở: ${date.toLocaleString()}${note ? ': ' + note : ''}`,
+          body: `Nhắc nhở: ${note}`,
           sound: 'default',
         },
-        trigger: { date },
+        trigger: { date: futureDate },
       });
-      // Alert.alert('Notification scheduled successfully!');
+      // Notification scheduled for a future time
     } catch (error) {
-      console.error('Failed to schedule notification:', error);
-      // Alert.alert('Failed to schedule notification. Please try again later.');
+      // Handle errors
     }
   };
-
   const registerForPushNotificationsAsync = async () => {
     if (Platform.OS === 'android') {
       Notifications.setNotificationChannelAsync('default', {
@@ -256,11 +255,11 @@ export default function ReminderNotifications({ route }) {
 
   const handleDeleteReminder = async (accId, time, index) => {
     try {
-      console.log('====================================');
-      console.log("data click vào ngày: ", format(accId.date, 'dd-MM-yyyy HH:mm'), index);
-      console.log("data click vào time: ", format(accId.date, 'HH:mm'), index);
-      console.log("data click vào tên: ", accId.note, index);
-      console.log('====================================');
+      // console.log('====================================');
+      // console.log("data click vào ngày: ", format(accId.date, 'dd-MM-yyyy HH:mm'), index);
+      // console.log("data click vào time: ", format(accId.date, 'HH:mm'), index);
+      // console.log("data click vào tên: ", accId.note, index);
+      // console.log('====================================');
 
       const updatedReminders = [...reminders];
 
@@ -357,7 +356,7 @@ export default function ReminderNotifications({ route }) {
       return acc;
     }, {});
 
-    console.log("reminders: ", reminders);
+    // console.log("reminders: ", reminders);
 
     return Object.entries(groupedReminders).map(([dateTime, reminders]) => {
       const [date, time] = dateTime.split(' ');

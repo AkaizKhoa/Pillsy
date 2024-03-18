@@ -346,29 +346,27 @@ export default function Scan() {
 
   let takePic = async () => {
     let options = {
-      exif: true,
-
+        exif: true,
     };
 
     let newPhoto = await cameraRef.current.takePictureAsync(options);
-    // Quay ảnh theo chiều dọc
+
+    // let isAndroid = Platform.OS === 'android';
+    // let rotateValue = isAndroid ?  0 : 0; 
+
     let manipulatedImage = await manipulateAsync(
-      newPhoto.uri,
-      [{ rotate: 0 }],
-      { format: 'jpeg' }
+        newPhoto.uri,
+        [{ rotate: 0 }],
+        { format: 'jpeg' }
     );
 
-    // Thay đổi kích thước ảnh nếu cần thiết (tùy chọn)
     let resizedImage = await manipulateAsync(
-      manipulatedImage.uri,
-      [{ resize: { width: newPhoto.width, height: newPhoto.height } }]
+        manipulatedImage.uri,
+        [{ resize: { width: newPhoto.width, height: newPhoto.height } }]
     );
 
     setPhoto(resizedImage);
-
-
-
-  };
+};
 
   if (photo) {
     let sharePic = () => {

@@ -127,7 +127,7 @@ export default function PaymentPackage() {
         const listOrder = response.data;
         console.log(listOrder.status);
         listOrder.sort(
-          (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
+          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
         );
         const firstItem = listOrder[0];
         let sPackage = firstItem.orderDetails[0].subscriptionPackage;

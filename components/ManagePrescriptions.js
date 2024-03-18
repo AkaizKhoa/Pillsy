@@ -21,7 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { BASE_URL } from "../config";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addDays  } from "date-fns";
 
 export default function ManagePrescriptions() {
   const [prescription, setPrescription] = useState("");
@@ -161,10 +161,9 @@ export default function ManagePrescriptions() {
                         Ngày scan đơn thuốc:{" "}
                       </Text>
                       <Text>
-                        {/* {data.createdDate
+                         {data.createdDate
                           ? format(parseISO(data.createdDate), "dd-MM-yyyy")
-                          : "N/A"} */}
-                          14/03/2024
+                          : "N/A"} 
                       </Text>
                     </View>
                     <View style={styles.context}>

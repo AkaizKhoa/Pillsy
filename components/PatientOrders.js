@@ -57,9 +57,9 @@ export default function PatientOrders() {
 
   useEffect(() => {
     const abortController = new AbortController();
-
+  
     const url = `${BASE_URL}/api/orders/all-orders/patient/${userInfo.PatientId}`;
-
+  
     const fetchData = async () => {
       try {
         setIsLoading(true);
@@ -71,15 +71,16 @@ export default function PatientOrders() {
         });
         console.log(response.data);
         const listOrderData = response.data;
+        // Sắp xếp theo ngày tạo mới nhất đến cũ nhất
         listOrderData.sort(
-          (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
+          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
         );
         setListOrder(listOrderData);
       } catch (error) {
         if (error.response && error.response.status === 404) {
           setListOrder([]);
         }
-
+  
         if (abortController.signal.aborted) {
           console.log("Data fetching cancelled");
         } else {
@@ -89,12 +90,11 @@ export default function PatientOrders() {
         setIsLoading(false);
       }
     };
-
+  
     fetchData();
-
+  
     return () => abortController.abort("Data fetching cancelled");
   }, [isFocused]);
-
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -133,7 +133,7 @@ export default function PatientOrders() {
               let createdDate = new Date(item.createdDate);
               let newDate = new Date(
                 createdDate.getTime() + sPackage.period * 24 * 60 * 60 * 1000
-              );
+              );  
               return (
                 <View style={styles.cardPrescription}>
                   <DotCard />

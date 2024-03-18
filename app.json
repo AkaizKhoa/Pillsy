@@ -3,7 +3,7 @@
     "name": "Pillsy",
     "slug": "Pillsy",
     "version": "1.0.0",
-    "orientation": "default",
+    "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -45,6 +45,11 @@
           "isAccessMediaLocationEnabled": "true"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a6588e7c-00f5-4c51-b577-5d9d841d324f"
+      }
+    }
   }
 }
